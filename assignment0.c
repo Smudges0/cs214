@@ -32,9 +32,9 @@ int main(int argc, char *argv[])
   // 3. Chose comparator based on tokens, set pointer to correct comparator
 
   // 4. Call sort with correct comparator and list, returns a new sorted linked list
-
+        // Implement comparators
+        // Research Sort algorithms and what linked lists operations we need
   // 5. Print sorted list to STDOUT
-
 
 
   // -------------------------------------------
