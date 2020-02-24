@@ -125,8 +125,9 @@ void pushNode(Node **head, Node *newNode)
   // Pass in **head which is a pointer to a pointer so that we
   // can update the address of head here and it will update in the
   // caller.
-  newNode->nextNode = *head;
-  *head = newNode;
+  newNode->nextNode = *head;   // newNode nextNode points to the OLD head node
+  (*head)->prevNode = newNode; // newNode prevNode points back to the NEW head node
+  *head = newNode;             // newNode is now the NEW head node
 }
 
 // void appendNode(Node** head, Node* newNode)
@@ -136,6 +137,7 @@ void pushNode(Node **head, Node *newNode)
 //   {
 //     tracer = &(*tracer)->nextNode;
 //   }
+//   newNode->nextNode = *tracer;
 //   *tracer = newNode;
 // }
 
