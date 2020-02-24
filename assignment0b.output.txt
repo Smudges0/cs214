@@ -1,0 +1,47 @@
+Arguments: -i, Test.txt
+
+Printing list head after pushNodes.  Second token is head
+-Next Token
+-First Token
+
+Printing list head2 after appendNodes.  Second token is at end
+-First Token
+-New1 Token
+
+Printing list head2 after insertNodeAfter head
+-First Token
+-Inserted Node
+-New1 Token
+
+Printing list head2 after insertNodeAfter new1
+-First Token
+-Inserted Node
+-New1 Token
+-Inserted Node after new1
+
+Printing list head2 after removeNode new1
+-First Token
+-Inserted Node
+-Inserted Node after new1
+
+Printing list head2 after insertNodeBefore head
+-New1 Token
+-First Token
+-Inserted Node
+-Inserted Node after new1
+
+Printing list head2 after removeNode head2
+-First Token
+-Inserted Node
+-Inserted Node after new1
+
+Printing list head2 after removeNode head2
+-Inserted Node
+-Inserted Node after new1
+
+Printing list head2 after removeNode head2
+-Inserted Node after new1
+
+Printing list head2 after removeNode head2
+
+[1] + Done                       "/usr/bin/gdb" --interpreter=mi --tty=${DbgTerm} 0<"/tmp/Microsoft-MIEngine-In-lipq1zd5.zu2" 1>"/tmp/Microsoft-MIEngine-Out-4up8d8q6.dgh"
