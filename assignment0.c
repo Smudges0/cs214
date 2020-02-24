@@ -5,14 +5,16 @@
 
 int insertionSort(void* toSort, int (*comparator)(void*, void*));
 int quickSort(void* toSort, int (*comparator)(void*, void*));
-void doNothing(char* test);
+
 
 typedef struct node
 {
-  char *token;
-  struct node *nextNode;
+  char* token;
+  struct node* nextNode;
 } Node;
-Node *makeNode(char *token);
+Node* makeNode(char *token);
+void pushNode(Node** head, Node* newNode);
+void appendNode(Node** head, Node* newNode);
 
 int main(int argc, char *argv[])
 {
@@ -36,9 +38,14 @@ int main(int argc, char *argv[])
 
 
   // -------------------------------------------
-  Node *head = NULL;
-  Node *new = makeNode("Test Token");
+  Node* head = NULL;
+  Node* new = makeNode("Test Token");
+  //pushNode(&head, new);
+  appendNode(&head, new);
   printf("%s, %s\n", sortType, fileName);
+  printf("%s\n", head->token);
+  appendNode(&head, makeNode("Next Token"));
+  printf("%s\n", (head->nextNode)->token);
 
 }
 
@@ -49,4 +56,34 @@ Node *makeNode(char *token)
   strcpy(new->token, token);
   new->nextNode = NULL; // This will be set on insertion
   return new;
+}
+
+void pushNode(Node** head, Node* newNode)
+{
+  newNode->nextNode = *head;
+  *head = newNode;
+}
+
+// void appendNode(Node** head, Node* newNode)
+// {
+//   Node **tracer = head;
+//   while (*tracer)
+//   {
+//     tracer = &(*tracer)->nextNode;
+//   }
+//   *tracer = newNode;
+// }
+
+void appendNode(Node** head, Node* newNode)
+{
+  Node* tracer = *head;
+  if (!tracer) {
+    pushNode(head, newNode);
+    return;
+  }
+  while (tracer->nextNode)
+  {
+    tracer = tracer->nextNode;
+  }
+  tracer->nextNode = newNode;
 }
