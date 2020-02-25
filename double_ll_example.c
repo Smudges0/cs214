@@ -41,8 +41,7 @@ int main(int argc, char *argv[])
   // -------------------------------------------
   // Test calls of the linked list methods.
   //--------------------------------------------
-  Node *head = malloc(sizeof(Node));
-  head = NULL;
+  Node *head = NULL;
   pushNode(&head, makeNode("-First Token"));
   pushNode(&head, makeNode("-Next Token"));
   printf("Printing list head after pushNodes.  Second token is head\n");
@@ -127,11 +126,11 @@ void pushNode(Node **head, Node *newNode)
   // can update the address of head here and it will update in the
   // caller.
   newNode->nextNode = *head; // newNode nextNode points to the OLD head node
-  newNode->prevNode = NULL;
-  if (*head)
-  {
-    (*head)->prevNode = newNode;
-  }
+  // newNode->prevNode = NULL;
+  // if (*head)
+  // {
+  //   (*head)->prevNode = newNode;
+  // }
   *head = newNode;
 }
 
@@ -175,7 +174,6 @@ void insertNodeAfter(Node **head, Node *prevNode, Node *newNode)
 
   // Remember current nextNode of prevNode.  Need to insert newNode between
   // prevNode and the nextNode.
-  //.....
 
   newNode->nextNode = prevNode->nextNode; // make newNode's next node same as prevNode's
   newNode->prevNode = prevNode;           // make newNode's previous node prevNode
@@ -194,8 +192,8 @@ void insertNodeBefore(Node **head, Node *nextNode, Node *newNode)
   if (!nextNode->prevNode)
   {
     // It is the head. Update the head to newNode.
-    //.....
-    *head = newNode;              // newNode is now the head
+    *head = newNode; // newNode is now the head
+    newNode->prevNode = NULL;
     newNode->nextNode = nextNode; // newNode's next node is now nextNode
     nextNode->prevNode = newNode; // nextNode's previous node is now the newNode
     return;
@@ -203,7 +201,6 @@ void insertNodeBefore(Node **head, Node *nextNode, Node *newNode)
 
   // Else, remember current prevNode of nextNode.  Need to insert newNode between
   // prevNode and the nextNode.
-  //.....
   newNode->nextNode = nextNode;
   newNode->prevNode = nextNode->prevNode;
   newNode->prevNode->nextNode = newNode;
@@ -219,27 +216,26 @@ void removeNode(Node **head, Node *removedNode)
   if (!removedNode->prevNode)
   {
     // Removing the head.  Need to update the head pointer.
-    //.....
     *head = removedNode->nextNode;
     // Remove the prevNode of the new head.
-    //.....
-    removedNode->nextNode->prevNode = NULL; // Disconnect removedNode from nextNode
-    free(removedNode);                      // Free memory
+    if (*head)
+    {
+      (*head)->prevNode = NULL; // Disconnect removedNode from nextNode
+      //free(removedNode);        // Free memory
+    }
     return;
   }
 
   // Else, connect the prevNode and nextNode together
-  //.....
   removedNode->nextNode->prevNode = removedNode->prevNode;
   removedNode->prevNode->nextNode = removedNode->nextNode;
-  free(removedNode);
+  //free(removedNode);
 }
 
 void printNodes(Node *aNode)
 {
   while (aNode)
   {
-    //.....
     printf("%s\n", aNode->token);
     aNode = aNode->nextNode;
   }
