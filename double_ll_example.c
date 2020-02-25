@@ -41,7 +41,8 @@ int main(int argc, char *argv[])
   // -------------------------------------------
   // Test calls of the linked list methods.
   //--------------------------------------------
-  Node *head = NULL;
+  Node *head = malloc(sizeof(Node));
+  head = NULL;
   pushNode(&head, makeNode("-First Token"));
   pushNode(&head, makeNode("-Next Token"));
   printf("Printing list head after pushNodes.  Second token is head\n");
@@ -125,9 +126,13 @@ void pushNode(Node **head, Node *newNode)
   // Pass in **head which is a pointer to a pointer so that we
   // can update the address of head here and it will update in the
   // caller.
-  newNode->nextNode = *head;   // newNode nextNode points to the OLD head node
-  (*head)->prevNode = newNode; // newNode prevNode points back to the NEW head node
-  *head = newNode;             // newNode is now the NEW head node
+  newNode->nextNode = *head; // newNode nextNode points to the OLD head node
+  newNode->prevNode = NULL;
+  if (*head)
+  {
+    (*head)->prevNode = newNode;
+  }
+  *head = newNode;
 }
 
 // void appendNode(Node** head, Node* newNode)
@@ -156,12 +161,12 @@ void appendNode(Node **head, Node *newNode)
   }
 
   // Else find the end of the list and add the node,
-  while (aNode->nextNode)
+  while (aNode->nextNode) // Keep going until nextNode is NULL
   {
     aNode = aNode->nextNode;
   }
-  aNode->nextNode = newNode;
-  newNode->prevNode = aNode;
+  aNode->nextNode = newNode; // set nextNode to newNode
+  newNode->prevNode = aNode; // set newNode's prevNode to aNode (Old last node)
 }
 
 void insertNodeAfter(Node **head, Node *prevNode, Node *newNode)
@@ -172,8 +177,15 @@ void insertNodeAfter(Node **head, Node *prevNode, Node *newNode)
   // prevNode and the nextNode.
   //.....
 
+  newNode->nextNode = prevNode->nextNode; // make newNode's next node same as prevNode's
+  newNode->prevNode = prevNode;           // make newNode's previous node prevNode
+  prevNode->nextNode = newNode;           // make prevNode's next node newNode
+
   // Check if oldNextNode is not null
-  //.....
+  if (newNode->nextNode)
+  {
+    newNode->nextNode->prevNode = newNode; // make next node's prevNode newNode
+  }
 }
 
 void insertNodeBefore(Node **head, Node *nextNode, Node *newNode)
@@ -183,12 +195,19 @@ void insertNodeBefore(Node **head, Node *nextNode, Node *newNode)
   {
     // It is the head. Update the head to newNode.
     //.....
+    *head = newNode;              // newNode is now the head
+    newNode->nextNode = nextNode; // newNode's next node is now nextNode
+    nextNode->prevNode = newNode; // nextNode's previous node is now the newNode
     return;
   }
 
   // Else, remember current prevNode of nextNode.  Need to insert newNode between
   // prevNode and the nextNode.
   //.....
+  newNode->nextNode = nextNode;
+  newNode->prevNode = nextNode->prevNode;
+  newNode->prevNode->nextNode = newNode;
+  newNode->nextNode->prevNode = newNode;
 }
 
 //
@@ -201,14 +220,19 @@ void removeNode(Node **head, Node *removedNode)
   {
     // Removing the head.  Need to update the head pointer.
     //.....
-
+    *head = removedNode->nextNode;
     // Remove the prevNode of the new head.
     //.....
+    removedNode->nextNode->prevNode = NULL; // Disconnect removedNode from nextNode
+    free(removedNode);                      // Free memory
     return;
   }
 
   // Else, connect the prevNode and nextNode together
   //.....
+  removedNode->nextNode->prevNode = removedNode->prevNode;
+  removedNode->prevNode->nextNode = removedNode->nextNode;
+  free(removedNode);
 }
 
 void printNodes(Node *aNode)
@@ -216,5 +240,7 @@ void printNodes(Node *aNode)
   while (aNode)
   {
     //.....
+    printf("%s\n", aNode->token);
+    aNode = aNode->nextNode;
   }
 }
