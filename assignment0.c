@@ -10,17 +10,23 @@ int stringComparator(void *, void *);
 typedef struct node
 {
   char *token;
+  int isString;
   struct node *nextNode;
   struct node *prevNode;
 } Node;
 
 Node *makeNode(char *token);
+void setNodeType(Node *node, int isString);
+void *getToken(Node *node);
 void pushNode(Node **head, Node *newNode);
 void appendNode(Node **head, Node *newNode);
 void printNodes(Node *aNode);
 void insertNodeAfter(Node **head, Node *prevNode, Node *newNode);
 void removeNode(Node **head, Node *removedNode);
 void insertNodeBefore(Node **head, Node *nextNode, Node *newNode);
+
+const int ISSTRING = 1;
+const int ISNUM = 0;
 
 int main(int argc, char *argv[])
 {
@@ -33,7 +39,7 @@ int main(int argc, char *argv[])
 
   // 2. Read tokens from file, put tokens into linked list, returns list
 
-  // 3. Chose comparator based on tokens, set pointer to correct comparator
+  // 3. Chose comparator based on isString flag, set pointer to correct comparator
 
   // 4. Call sort with correct comparator and list, returns a new sorted linked list
   // Implement comparators
@@ -118,8 +124,8 @@ int main(int argc, char *argv[])
   void *y = &b;
   void *z = &c;
 
-  printf("%d : Expected value should be 1.\n", numComparator(x, y));
-  printf("%d : Expected value should be -1.\n", numComparator(y, x));
+  printf("%d : Expected value should be positive.\n", numComparator(x, y));
+  printf("%d : Expected value should be negative.\n", numComparator(y, x));
   printf("%d : Expected value should be 0.\n", numComparator(y, z));
   printf("\n");
 
@@ -127,56 +133,79 @@ int main(int argc, char *argv[])
   y = "bcd";
   z = "abcd";
   void *z1 = "";
-  printf("%d : Expected value should be -1.\n", stringComparator(x, y));
-  printf("%d : Expected value should be 1.\n", stringComparator(y, x));
+  printf("%d : Expected value should be negative.\n", stringComparator(x, y));
+  printf("%d : Expected value should be positive.\n", stringComparator(y, x));
   printf("%d : Expected value should be 0.\n", stringComparator(x, x));
-  printf("%d : Expected value should be -1.\n", stringComparator(x, z));
-  printf("%d : Expected value should be 1.\n", stringComparator(z, x));
-  printf("%d : Expected value should be 1.\n", stringComparator(x, z1));
-  printf("%d : Expected value should be -1.\n", stringComparator(z1, x));
+  printf("%d : Expected value should be negative.\n", stringComparator(x, z));
+  printf("%d : Expected value should be positive.\n", stringComparator(z, x));
+  printf("%d : Expected value should be positive.\n", stringComparator(x, z1));
+  printf("%d : Expected value should be negative.\n", stringComparator(z1, x));
   printf("%d : Expected value should be 0.\n", stringComparator(z1, z1));
+
+  // -------------------------------------------
+  // Test calls for num/string linkedLists
+  //--------------------------------------------
+
+  // Node *headNum = makeNode("1");
+  // appendNode(&headNum, makeNode("2"));
+  // appendNode(&headNum, makeNode("-3"));
+  // setNodeType(headNum, ISNUM);
+
+  // Node *headString = makeNode("abc");
+  // appendNode(&headString, makeNode("bcd"));
+  // appendNode(&headString, makeNode("abcd"));
+  // setNodeType(headString, ISSTRING);
+
+  // insertionSort(headNum, &numComparator);
+  // insertionSort(headString, &stringComparator);
+  // quickSort(headNum, &numComparator);
+  // quickSort(headString, &stringComparator);
 }
+
+// -------------------------------------------
+// Sort Functions
+//--------------------------------------------
+
+int insertionSort(void *toSort, int (*comparator)(void *, void *))
+{
+  Node *head = (Node *)toSort;
+  void *token1 = getToken(head);
+  int x = *(int *)token1;
+  void *token2 = getToken(head->nextNode);
+  int y = *(int *)token2;
+  printf("%d\n", comparator(token1, token2));
+}
+
+int quickSort(void *toSort, int (*comparator)(void *, void *))
+{
+  Node *head = (Node *)toSort;
+  printf("%d\n", comparator(getToken(head), getToken(head->nextNode)));
+}
+
+// -------------------------------------------
+// Comparators
+//--------------------------------------------
 
 int numComparator(void *int1, void *int2)
 {
   int x = *(int *)int1;
   int y = *(int *)int2;
-  if (x > y)
-  {
-    return 1;
-  }
-  else if (x < y)
-  {
-    return -1;
-  }
-  return 0;
+  return x - y;
 }
 
 int stringComparator(void *string1, void *string2)
 {
   char *x = (char *)string1;
   char *y = (char *)string2;
-  for (x; *x != '\0'; x++)
+  int i;
+  for (i = 0; x[i] != '\0' && y[i] != '\0'; i++)
   {
-    if (*y == '\0')
+    if (x[i] != y[i])
     {
-      return 1;
+      break;
     }
-    if (*x > *y)
-    {
-      return 1;
-    }
-    if (*x < *y)
-    {
-      return -1;
-    }
-    y++;
   }
-  if (*y == '\0')
-  {
-    return 0;
-  }
-  return -1;
+  return x[i] - y[i];
 }
 
 // -------------------------------------------
@@ -188,9 +217,31 @@ Node *makeNode(char *token)
   Node *new = malloc(sizeof(Node));
   new->token = malloc(strlen(token) + 1);
   strcpy(new->token, token);
+  new->isString = ISNUM;
   new->nextNode = NULL;
   new->prevNode = NULL;
   return new;
+}
+
+void setNodeType(Node *node, int isString)
+{
+  node->isString = isString;
+  if (node->nextNode)
+  {
+    setNodeType(node->nextNode, isString);
+  }
+}
+
+void *getToken(Node *node)
+{
+  if (node->isString)
+  {
+    return node->token;
+  }
+  int x = atoi(node->token);
+  int *intTokenP = malloc(sizeof(x));
+  *intTokenP = x;
+  return intTokenP;
 }
 
 // pushNode adds a new node at the beginning of the linked list.
