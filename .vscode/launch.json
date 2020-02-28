@@ -8,7 +8,7 @@
       "name": "g++ build and debug active file",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${fileDirname}/${fileBasenameNoExtension}",
+      "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
       "args": [
         "-i",
         "Test.txt"
@@ -19,11 +19,11 @@
       "externalConsole": false,
       "MIMode": "gdb",
       "setupCommands": [
-          {
-              "description": "Enable pretty-printing for gdb",
-              "text": "-enable-pretty-printing",
-              "ignoreFailures": true
-          }
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
       ],
       "preLaunchTask": "g++ build active file",
       "miDebuggerPath": "/usr/bin/gdb"
@@ -32,8 +32,11 @@
       "name": "gcc build and debug active file",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${fileDirname}/${fileBasenameNoExtension}",
-      "args": ["-i", "Test.txt"],
+      "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
+      "args": [
+        "-i",
+        "Test.txt"
+      ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],
