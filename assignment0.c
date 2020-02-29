@@ -9,15 +9,17 @@ int stringComparator(void *, void *);
 
 typedef struct node
 {
-  char *token;
+  char *tokenStr;
+  int *tokenInt;
   int isString;
   struct node *nextNode;
   struct node *prevNode;
 } Node;
 
-Node *makeNode(char *token);
-void setNodeType(Node *node, int isString);
+Node *makeNodeStr(char *token);
+Node *makeNodeInt(int token);
 void *getToken(Node *node);
+Node *changeHeadPtr(Node *head);
 void pushNode(Node **head, Node *newNode);
 void appendNode(Node **head, Node *newNode);
 void printNodes(Node *aNode);
@@ -117,30 +119,30 @@ int main(int argc, char *argv[])
   // -------------------------------------------
   // Test calls for comparators
   //--------------------------------------------
-  int a = 9;
-  int b = 7;
-  int c = 7;
-  void *x = &a;
-  void *y = &b;
-  void *z = &c;
+  // int a = 9;
+  // int b = 7;
+  // int c = 7;
+  // void *x = &a;
+  // void *y = &b;
+  // void *z = &c;
 
-  printf("%d : Expected value should be positive.\n", numComparator(x, y));
-  printf("%d : Expected value should be negative.\n", numComparator(y, x));
-  printf("%d : Expected value should be 0.\n", numComparator(y, z));
-  printf("\n");
+  // printf("%d : Expected value should be positive.\n", numComparator(x, y));
+  // printf("%d : Expected value should be negative.\n", numComparator(y, x));
+  // printf("%d : Expected value should be 0.\n", numComparator(y, z));
+  // printf("\n");
 
-  x = "abc";
-  y = "bcd";
-  z = "abcd";
-  void *z1 = "";
-  printf("%d : Expected value should be negative.\n", stringComparator(x, y));
-  printf("%d : Expected value should be positive.\n", stringComparator(y, x));
-  printf("%d : Expected value should be 0.\n", stringComparator(x, x));
-  printf("%d : Expected value should be negative.\n", stringComparator(x, z));
-  printf("%d : Expected value should be positive.\n", stringComparator(z, x));
-  printf("%d : Expected value should be positive.\n", stringComparator(x, z1));
-  printf("%d : Expected value should be negative.\n", stringComparator(z1, x));
-  printf("%d : Expected value should be 0.\n", stringComparator(z1, z1));
+  // x = "abc";
+  // y = "bcd";
+  // z = "abcd";
+  // void *z1 = "";
+  // printf("%d : Expected value should be negative.\n", stringComparator(x, y));
+  // printf("%d : Expected value should be positive.\n", stringComparator(y, x));
+  // printf("%d : Expected value should be 0.\n", stringComparator(x, x));
+  // printf("%d : Expected value should be negative.\n", stringComparator(x, z));
+  // printf("%d : Expected value should be positive.\n", stringComparator(z, x));
+  // printf("%d : Expected value should be positive.\n", stringComparator(x, z1));
+  // printf("%d : Expected value should be negative.\n", stringComparator(z1, x));
+  // printf("%d : Expected value should be 0.\n", stringComparator(z1, z1));
 
   // -------------------------------------------
   // Test calls for num/string linkedLists
@@ -149,17 +151,37 @@ int main(int argc, char *argv[])
   // Node *headNum = makeNode("1");
   // appendNode(&headNum, makeNode("2"));
   // appendNode(&headNum, makeNode("-3"));
-  // setNodeType(headNum, ISNUM);
 
   // Node *headString = makeNode("abc");
   // appendNode(&headString, makeNode("bcd"));
   // appendNode(&headString, makeNode("abcd"));
-  // setNodeType(headString, ISSTRING);
 
   // insertionSort(headNum, &numComparator);
   // insertionSort(headString, &stringComparator);
   // quickSort(headNum, &numComparator);
   // quickSort(headString, &stringComparator);
+
+  // -------------------------------------------
+  // Test calls for num/string linkedLists
+  //--------------------------------------------
+
+  Node *headNum = makeNodeInt(1);
+  appendNode(&headNum, makeNodeInt(2));
+  appendNode(&headNum, makeNodeInt(3));
+  appendNode(&headNum, makeNodeInt(9));
+  appendNode(&headNum, makeNodeInt(2));
+
+  // Node *headString = makeNodeStr("cat");
+  // appendNode(&headString, makeNodeStr("bird"));
+  // appendNode(&headString, makeNodeStr("dog"));
+
+  printf("Before Sort:\n");
+  printNodes(headNum);
+  insertionSort(headNum, &numComparator);
+  headNum = changeHeadPtr(headNum);
+  printf("After Sort:\n");
+  printNodes(headNum);
+  //insertionSort(headString, &stringComparator);
 }
 
 // -------------------------------------------
@@ -169,11 +191,35 @@ int main(int argc, char *argv[])
 int insertionSort(void *toSort, int (*comparator)(void *, void *))
 {
   Node *head = (Node *)toSort;
-  void *token1 = getToken(head);
-  int x = *(int *)token1;
-  void *token2 = getToken(head->nextNode);
-  int y = *(int *)token2;
-  printf("%d\n", comparator(token1, token2));
+  Node *key = head->nextNode;
+  while(key != NULL)
+  {
+    Node *j = key->prevNode;
+    void *keyToken = getToken(key);
+    void *jToken = getToken(j);
+    printf("%d %d\n", *(int*)jToken, *(int*)keyToken);
+    while(j->prevNode != NULL)
+    {
+      if (comparator(jToken, keyToken) >= 0)
+      {
+        Node *oldKey = key;
+        key = key->nextNode;
+        removeNode(&head, oldKey);
+        insertNodeBefore(&head, j, oldKey);
+        break;
+      }
+      j = j->prevNode;
+      jToken = getToken(j);
+    }
+    
+    if (j->prevNode == NULL &&(comparator(jToken, keyToken) >= 0))
+    {
+      Node *oldKey = key;
+      key = key->nextNode;
+      removeNode(&head, oldKey);
+      insertNodeAfter(&head, j, oldKey);
+    }
+  }
 }
 
 int quickSort(void *toSort, int (*comparator)(void *, void *))
@@ -212,36 +258,44 @@ int stringComparator(void *string1, void *string2)
 // Double-linked list
 //--------------------------------------------
 
-Node *makeNode(char *token)
+Node *makeNodeStr(char *token)
 {
   Node *new = malloc(sizeof(Node));
-  new->token = malloc(strlen(token) + 1);
-  strcpy(new->token, token);
+  new->tokenStr = malloc(strlen(token) + 1);
+  strcpy(new->tokenStr, token);
+  new->isString = ISSTRING;
+  new->nextNode = NULL;
+  new->prevNode = NULL;
+  return new;
+}
+
+Node *makeNodeInt(int token)
+{
+  Node *new = malloc(sizeof(Node));
+  new->tokenInt = malloc(sizeof(int));
+  *(new->tokenInt) = token;
   new->isString = ISNUM;
   new->nextNode = NULL;
   new->prevNode = NULL;
   return new;
 }
 
-void setNodeType(Node *node, int isString)
-{
-  node->isString = isString;
-  if (node->nextNode)
-  {
-    setNodeType(node->nextNode, isString);
-  }
-}
-
 void *getToken(Node *node)
 {
   if (node->isString)
   {
-    return node->token;
+    return node->tokenStr;
   }
-  int x = atoi(node->token);
-  int *intTokenP = malloc(sizeof(x));
-  *intTokenP = x;
-  return intTokenP;
+  return node->tokenInt;
+}
+
+Node *changeHeadPtr(Node *head)
+{
+  while(head->prevNode != NULL)
+  {
+    head = head->prevNode;
+  }
+  return head;
 }
 
 // pushNode adds a new node at the beginning of the linked list.
@@ -348,20 +402,39 @@ void removeNode(Node **head, Node *removedNode)
       (*head)->prevNode = NULL; // Disconnect removedNode from nextNode
       //free(removedNode);        // Free memory
     }
+    removedNode->nextNode = NULL;
     return;
   }
 
   // Else, connect the prevNode and nextNode together
-  removedNode->nextNode->prevNode = removedNode->prevNode;
+  if(removedNode->nextNode)
+  {
+    removedNode->nextNode->prevNode = removedNode->prevNode;
+  }
   removedNode->prevNode->nextNode = removedNode->nextNode;
+  removedNode->prevNode = NULL;
+  removedNode->nextNode = NULL;
   //free(removedNode);
 }
 
 void printNodes(Node *aNode)
 {
-  while (aNode)
+  if(aNode->isString)
   {
-    printf("%s\n", aNode->token);
-    aNode = aNode->nextNode;
+    while (aNode)
+    {
+      printf("%s\n", aNode->tokenStr);
+      aNode = aNode->nextNode;
+    }
   }
+  else
+  {
+    while (aNode)
+    {
+      printf("%d\n", *(aNode->tokenInt));
+      aNode = aNode->nextNode;
+    }
+  }
+  
+  
 }
