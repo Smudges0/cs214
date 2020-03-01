@@ -10,8 +10,7 @@ int insertionSort(void *toSort, int (*comparator)(void *, void *));
 int quickSort(void *toSort, int (*comparator)(void *, void *));
 int numComparator(void *, void *);
 int stringComparator(void *, void *);
-void setFileType(char *token);
-
+int setFileType(char *token);
 
 typedef struct node
 {
@@ -22,6 +21,10 @@ typedef struct node
   struct node *prevNode;
 } Node;
 
+void swapValue(Node *a, Node *b);
+void _quickSort(Node *last, Node *head, int (*comparator)(void *, void *));
+Node *partition(Node *l, Node *h, int (*comparator)(void *, void *));
+Node *lastNode(Node *root);
 void getNumList(Node **headRef);
 void readFile(char *fileName, Node **headRef);
 Node *makeNodeStr(char *token);
@@ -34,6 +37,7 @@ void printNodes(Node *aNode);
 void insertNodeAfter(Node **head, Node *prevNode, Node *newNode);
 void removeNode(Node **head, Node *removedNode);
 void insertNodeBefore(Node **head, Node *nextNode, Node *newNode);
+void freeNodes(Node *aNode);
 
 const int ISSTRING = 1;
 const int ISNUM = 0;
@@ -49,6 +53,12 @@ int main(int argc, char *argv[])
   // 1. Read args from command line (sort type, file name) and set flags
   printf("Arguments: %s, %s\n\n", sortType, fileName);
 
+  if (!((sortType[0] == '-') && (sortType[1] == 'q' || sortType[1] == 'i')))
+  {
+    fprintf(stderr, "Invalid sort type: %s.\n", sortType);
+    exit(1);
+  }
+  
   // 2. Read tokens from file, put tokens into linked list, returns list
   Node *headRef = NULL;
   readFile(fileName, &headRef);
@@ -61,26 +71,23 @@ int main(int argc, char *argv[])
   {
     comparator = &stringComparator;
   }
-  else comparator = &numComparator;
+  else
+    comparator = &numComparator;
 
   // 4. Call sort with correct comparator and list, returns a new sorted linked list
-  if (sortType[0] == '-' && sortType[1] == 'i')
+  if (sortType[1] == 'i')
   {
     insertionSort(headRef, comparator);
   }
-  else if (sortType[0] == '-' && sortType[1] == 'q')
+  else if (sortType[1] == 'q')
   {
     quickSort(headRef, comparator);
-  }
-  else
-  {
-    fprintf(stderr, "Invalid sort type: %s.\n", sortType);
-    exit(1);
   }
 
   headRef = changeHeadPtr(headRef);
   printf("After sort:\n");
   printNodes(headRef);
+
   // Implement comparators
   // Research Sort algorithms and what linked lists operations we need
   // 5. Print sorted list to STDOUT
@@ -99,7 +106,6 @@ int main(int argc, char *argv[])
   //printf("%s\n", (head->nextNode)->token);
   printNodes(head);
   printf("\n");
-
   Node *head2 = NULL;
   appendNode(&head2, makeNode("-First Token"));
   Node *new1 = makeNode("-New1 Token");
@@ -107,47 +113,39 @@ int main(int argc, char *argv[])
   printf("Printing list head2 after appendNodes.  Second token is at end\n");
   printNodes(head2);
   printf("\n");
-
   insertNodeAfter(&head2, head2, makeNode("-Inserted Node"));
   printf("Printing list head2 after insertNodeAfter head\n");
   printNodes(head2);
   printf("\n");
-
   insertNodeAfter(&head2, new1, makeNode("-Inserted Node after new1"));
   printf("Printing list head2 after insertNodeAfter new1\n");
   printNodes(head2);
   printf("\n");
-
   // Remove middle node
   removeNode(&head2, new1);
   printf("Printing list head2 after removeNode new1\n");
   printNodes(head2);
   printf("\n");
-
   // Add the removed node back at the head
   insertNodeBefore(&head2, head2, new1);
   printf("Printing list head2 after insertNodeBefore head\n");
   printNodes(head2);
   printf("\n");
-
   // Remove head node
   removeNode(&head2, head2);
   printf("Printing list head2 after removeNode head2\n");
   printNodes(head2);
   printf("\n");
-
   // Remove head node
   removeNode(&head2, head2);
   printf("Printing list head2 after removeNode head2\n");
   printNodes(head2);
   printf("\n");
-
   // Remove head node
   removeNode(&head2, head2);
   printf("Printing list head2 after removeNode head2\n");
   printNodes(head2);
   printf("\n");
-
   // Remove head node
   removeNode(&head2, head2);
   printf("Printing list head2 after removeNode head2\n");
@@ -231,8 +229,8 @@ int main(int argc, char *argv[])
   // headString = changeHeadPtr(headString);
   // printf("After Sort:\n");
   // printNodes(headString);
-
-
+  freeNodes(headRef);
+  exit(EXIT_SUCCESS);
 }
 
 // -------------------------------------------
@@ -241,22 +239,16 @@ int main(int argc, char *argv[])
 
 int insertionSort(void *toSort, int (*comparator)(void *, void *))
 {
-  Node *sortedHead = NULL;  // Make second list called sortedHead
+  Node *sortedHead = NULL;    // Make second list called sortedHead
   Node *key = (Node *)toSort; // Pointer to values in original list, scan from left to right
   while (key != NULL)
   {
-    Node *nextKey = key->nextNode;  // Keeps track of next value to be scanned. Previous node gets moved, so it will be lost otherwise
-    Node *j; // Pointer to values in sorted list, scan from left to right to insert next value
-    if (sortedHead == NULL || (comparator(getToken(sortedHead), getToken(key))) >= 0) // Checks if sorted list is empty or 
+    Node *nextKey = key->nextNode;                                                    // Keeps track of next value to be scanned. Previous node gets moved, so it will be lost otherwise
+    Node *j;                                                                          // Pointer to values in sorted list, scan from left to right to insert next value
+    if (sortedHead == NULL || (comparator(getToken(sortedHead), getToken(key))) >= 0) // Checks if sorted list is empty or
                                                                                       // if key is smaller than head
     {
-      key->nextNode = sortedHead; // Insert before head
-      if (sortedHead)
-      {
-        sortedHead->prevNode = key;
-      }
-      key->prevNode = NULL;
-      sortedHead = key;
+      insertNodeBefore(&sortedHead, sortedHead, key);
     }
     else
     {
@@ -266,13 +258,7 @@ int insertionSort(void *toSort, int (*comparator)(void *, void *))
       {
         j = j->nextNode;
       }
-      key->nextNode = j->nextNode;
-      if (j->nextNode)
-      {
-        j->nextNode->prevNode = key;
-      }
-      j->nextNode = key;
-      key->prevNode = j;
+      insertNodeAfter(&sortedHead, j, key);
     }
 
     // move on to next key
@@ -280,10 +266,72 @@ int insertionSort(void *toSort, int (*comparator)(void *, void *))
   }
 }
 
+void swapValue(Node *a, Node *b)
+{
+  if (!a->isString)
+  {
+    int t = *(a->tokenInt);
+    *(a->tokenInt) = *(b->tokenInt);
+    *(b->tokenInt) = t;
+  }
+  else
+  {
+    char *t = a->tokenStr;
+    a->tokenStr = b->tokenStr;
+    b->tokenStr = t;
+  }
+}
+
 int quickSort(void *toSort, int (*comparator)(void *, void *))
 {
   Node *head = (Node *)toSort;
-  printf("%d\n", comparator(getToken(head), getToken(head->nextNode)));
+  Node *tail = lastNode(toSort);
+  _quickSort(head, tail, comparator);
+
+  //printf("%d\n", comparator(getToken(head), getToken(head->nextNode)));
+}
+
+void _quickSort(Node *head, Node *tail, int (*comparator)(void *, void *))
+{
+  if (tail != NULL && head != tail && head != tail->nextNode)
+  {
+    Node *p = partition(head, tail, comparator);
+    _quickSort(head, p->prevNode, comparator);
+    _quickSort(p->nextNode, tail, comparator);
+  }
+}
+
+Node *partition(Node *head, Node *tail, int (*comparator)(void *, void *))
+{
+  // set pivot as l element
+  void *x = getToken(head);
+
+  // similar to i = l-1 for array implementation
+  Node *i = tail->nextNode;
+
+  // Similar to "for (int j = l; j <= h- 1; j++)"
+  for (Node *j = tail; j != head; j = j->prevNode)
+  {
+    if (comparator(getToken(j), x) >= 0)
+    {
+      // Similar to i++ for array
+      i = (i == NULL) ? tail : i->prevNode;
+
+      swapValue(i, j);
+    }
+  }
+  i = (i == NULL) ? tail : i->prevNode; // Similar to i++
+  swapValue(i, head);
+  return i;
+}
+
+Node *lastNode(Node *tail)
+{
+  while (tail && tail->nextNode)
+  {
+    tail = tail->nextNode;
+  }
+  return tail;
 }
 
 // -------------------------------------------
@@ -349,7 +397,7 @@ void *getToken(Node *node)
 
 Node *changeHeadPtr(Node *head)
 {
-  while(head->prevNode != NULL)
+  while (head->prevNode != NULL)
   {
     head = head->prevNode;
   }
@@ -425,6 +473,14 @@ void insertNodeAfter(Node **head, Node *prevNode, Node *newNode)
 
 void insertNodeBefore(Node **head, Node *nextNode, Node *newNode)
 {
+  if (!(*head))
+  {
+    *head = newNode; // newNode is now the head
+    newNode->prevNode = NULL;
+    newNode->nextNode = NULL;
+    return;
+  }
+
   // Check if the nextNode is the head.  If so, need to update the head.
   if (!nextNode->prevNode)
   {
@@ -465,7 +521,7 @@ void removeNode(Node **head, Node *removedNode)
   }
 
   // Else, connect the prevNode and nextNode together
-  if(removedNode->nextNode)
+  if (removedNode->nextNode)
   {
     removedNode->nextNode->prevNode = removedNode->prevNode;
   }
@@ -477,7 +533,7 @@ void removeNode(Node **head, Node *removedNode)
 
 void printNodes(Node *aNode)
 {
-  if(aNode->isString)
+  if (aNode->isString)
   {
     while (aNode)
     {
@@ -495,6 +551,23 @@ void printNodes(Node *aNode)
   }
 }
 
+void freeNodes(Node *aNode)
+{
+    Node *nextNode = aNode->nextNode;
+    if (aNode->isString)
+    {
+      free(aNode->tokenStr);
+    }
+    else 
+    {
+      free(aNode->tokenInt);
+    }
+    free(aNode);
+    if (nextNode)
+    {
+      freeNodes(nextNode);
+    }
+}
 // -------------------------------------------
 // Read from File
 //--------------------------------------------
@@ -507,7 +580,7 @@ void readFile(char *fileName, Node **headRef)
   if (fd == -1)
   {
     printf("Error Number % d\n", errno);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   // Buffer to hold a single complete token read from file.
@@ -516,7 +589,8 @@ void readFile(char *fileName, Node **headRef)
   if (tokenBuf == NULL)
   {
     fprintf(stderr, "out of memory for tokenBuf\n");
-    exit(1);
+    close(fd);
+    exit(EXIT_FAILURE);
   }
 
   // Buffer to hold data read from file.  May not be a complete token.
@@ -526,7 +600,8 @@ void readFile(char *fileName, Node **headRef)
   if (readBuf == NULL)
   {
     fprintf(stderr, "out of memory for readBuf\n");
-    exit(1);
+    close(fd);
+    exit(EXIT_FAILURE);
   }
 
   int bytes_read;
@@ -548,7 +623,10 @@ void readFile(char *fileName, Node **headRef)
     else if (bytes_read < 0)
     {
       perror("File Read Error");
-      exit(1);
+      free(readBuf);
+      free(tokenBuf);
+      close(fd);
+      exit(EXIT_FAILURE);
     }
     else if (bytes_read == 0)
     {
@@ -561,12 +639,16 @@ void readFile(char *fileName, Node **headRef)
       /* time to make it bigger */
       tokenBufSize += 10;
       printf("-----Growing %d-----", tokenBufSize);
-      tokenBuf = realloc(tokenBuf, tokenBufSize);
-      if (tokenBuf == NULL)
+      char *tokenBuf2 = realloc(tokenBuf, tokenBufSize);
+      if (tokenBuf2 == NULL)
       {
         fprintf(stderr, "out of memory for tokenBuf realloc\n");
-        exit(1);
+        free(readBuf);
+        free(tokenBuf);
+        close(fd);
+        exit(EXIT_FAILURE);
       }
+      else tokenBuf = tokenBuf2;
     }
 
     printf("%.*s", bytes_read, readBuf);
@@ -575,7 +657,7 @@ void readFile(char *fileName, Node **headRef)
     // If end of the token is reached, check if it is a valid number or string token.
     if (aChar == ',')
     {
-      emptyFile = 0;  // Differentiate between empty file and empty token at end of file
+      emptyFile = 0; // Differentiate between empty file and empty token at end of file
 
       // Ignore empty tokens
       if (tokenLength == 0)
@@ -590,8 +672,14 @@ void readFile(char *fileName, Node **headRef)
 
       appendNode(headRef, makeNodeStr(tokenBuf)); // Store token as a string in a linked list
 
-      setFileType(tokenBuf);
-      
+      if (setFileType(tokenBuf) == EXIT_FAILURE)
+      {
+        free(readBuf);
+        free(tokenBuf);
+        close(fd);
+        exit(EXIT_FAILURE);
+      }
+
       // Reset token pointer to 0 to read next token
       tokenLength = 0;
     }
@@ -611,9 +699,14 @@ void readFile(char *fileName, Node **headRef)
     tokenBuf[tokenLength] = '\0';
     appendNode(headRef, makeNodeStr(tokenBuf));
 
-    setFileType(tokenBuf);
+    if (setFileType(tokenBuf) == EXIT_FAILURE)
+    {
+      free(readBuf);
+      free(tokenBuf);
+      close(fd);
+      exit(EXIT_FAILURE);
+    }
     printf("\n\nEnd of file: tokenLength = %d  Leftover token [%s]", tokenLength, tokenBuf);
-    
   }
   else
   {
@@ -630,14 +723,19 @@ void readFile(char *fileName, Node **headRef)
   {
     getNumList(headRef);
   }
-  printf("\n\n\n");
+
+  //Cleanup on success
+  free(readBuf);
+  free(tokenBuf);
+  close(fd);
 }
 
-void setFileType(char *token)
+int setFileType(char *token)
 {
   // hasAlpha = 0;
   // hasNumber = 0;
-  for (int i = 0; i < strlen(token); i++)
+  int i;
+  for (i = 0; i < strlen(token); i++)
   {
     char tChar = token[i];
     //printf("%c ", tChar);
@@ -653,16 +751,16 @@ void setFileType(char *token)
       hasAlpha = 1;
       hasNumber = 0;
     }
-    if (!(tChar == '-' && i == 0 && isdigit(token[i+1])) && !isdigit(tChar) && !isalpha(tChar))
+    if (!(tChar == '-' && i == 0 && isdigit(token[i + 1])) && !isdigit(tChar) && !isalpha(tChar))
     {
       fprintf(stderr, "Illegal character: [%c] (ASCII: %d)\n", tChar, tChar);
-      exit(1);
+      return 1;
     }
   }
   if (hasNumber && (strlen(token) > sizeof(int)))
   {
     fprintf(stderr, "Number is too large for integer.\n");
-    exit(1);
+    return 1;
   }
 
   // printf("\n");
@@ -678,6 +776,7 @@ void setFileType(char *token)
   // {
   //   printf("Illegal!\n\n");
   // }
+  return 0;
 }
 
 void getNumList(Node **headRef)
