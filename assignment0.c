@@ -170,10 +170,14 @@ int main(int argc, char *argv[])
   appendNode(&headNum, makeNodeInt(3));
   appendNode(&headNum, makeNodeInt(9));
   appendNode(&headNum, makeNodeInt(2));
+  appendNode(&headNum, makeNodeInt(NULL));
 
-  // Node *headString = makeNodeStr("cat");
-  // appendNode(&headString, makeNodeStr("bird"));
-  // appendNode(&headString, makeNodeStr("dog"));
+  Node *headString = makeNodeStr("cat");
+  appendNode(&headString, makeNodeStr("bird"));
+  appendNode(&headString, makeNodeStr("dog"));
+  appendNode(&headString, makeNodeStr(""));
+  appendNode(&headString, makeNodeStr("dog"));
+  appendNode(&headString, makeNodeStr("doge"));
 
   printf("Before Sort:\n");
   printNodes(headNum);
@@ -181,7 +185,13 @@ int main(int argc, char *argv[])
   headNum = changeHeadPtr(headNum);
   printf("After Sort:\n");
   printNodes(headNum);
-  //insertionSort(headString, &stringComparator);
+
+  printf("Before Sort:\n");
+  printNodes(headString);
+  insertionSort(headString, &stringComparator);
+  headString = changeHeadPtr(headString);
+  printf("After Sort:\n");
+  printNodes(headString);
 }
 
 // -------------------------------------------
@@ -190,35 +200,42 @@ int main(int argc, char *argv[])
 
 int insertionSort(void *toSort, int (*comparator)(void *, void *))
 {
-  Node *head = (Node *)toSort;
-  Node *key = head->nextNode;
-  while(key != NULL)
+  Node *sortedHead = NULL;  // Make second list called sortedHead
+  Node *key = (Node *)toSort; // Pointer to values in original list, scan from left to right
+  while (key != NULL)
   {
-    Node *j = key->prevNode;
-    void *keyToken = getToken(key);
-    void *jToken = getToken(j);
-    printf("%d %d\n", *(int*)jToken, *(int*)keyToken);
-    while(j->prevNode != NULL)
+    Node *nextKey = key->nextNode;  // Keeps track of next value to be scanned. Previous node gets moved, so it will be lost otherwise
+    Node *j; // Pointer to values in sorted list, scan from left to right to insert next value
+    if (sortedHead == NULL || (comparator(getToken(sortedHead), getToken(key))) >= 0) // Checks if sorted list is empty or 
+                                                                                      // if key is smaller than head
     {
-      if (comparator(jToken, keyToken) >= 0)
+      key->nextNode = sortedHead; // Insert before head
+      if (sortedHead)
       {
-        Node *oldKey = key;
-        key = key->nextNode;
-        removeNode(&head, oldKey);
-        insertNodeBefore(&head, j, oldKey);
-        break;
+        sortedHead->prevNode = key;
       }
-      j = j->prevNode;
-      jToken = getToken(j);
+      key->prevNode = NULL;
+      sortedHead = key;
     }
-    
-    if (j->prevNode == NULL &&(comparator(jToken, keyToken) >= 0))
+    else
     {
-      Node *oldKey = key;
-      key = key->nextNode;
-      removeNode(&head, oldKey);
-      insertNodeAfter(&head, j, oldKey);
+      // Scans sorted list from left to right until it finds a spot to insert key
+      j = sortedHead;
+      while (j->nextNode != NULL && (comparator(getToken(j->nextNode), getToken(key)) < 0))
+      {
+        j = j->nextNode;
+      }
+      key->nextNode = j->nextNode;
+      if (j->nextNode)
+      {
+        j->nextNode->prevNode = key;
+      }
+      j->nextNode = key;
+      key->prevNode = j;
     }
+
+    // move on to next key
+    key = nextKey;
   }
 }
 
