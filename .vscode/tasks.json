@@ -12,7 +12,11 @@
       ],
       "options": {
         "cwd": "/usr/bin"
-      }
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "group": "build"
     },
     {
       "type": "shell",
