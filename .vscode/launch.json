@@ -34,8 +34,8 @@
       "request": "launch",
       "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
       "args": [
-        "-i",
-        "./testCases/test17.txt"
+        "-q",
+        "./testCases/test5.txt"
       ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",

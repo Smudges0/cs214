@@ -1,0 +1,9 @@
+-123
+cat
+cat
+dog
+doge
+mouse
+seagul
+trex
+viper

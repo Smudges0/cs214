@@ -1,0 +1,32 @@
+We created 20 test txt files, which we would batch call our fileSort.c on.
+Examples of all the test output is available in the testCases directory.
+
+
+test0 - contained alpha tokens of varying size, integer tokens both negative and positive, mixed alphanumeric tokens, and empty tokens
+test1 - empty file. Tested handling empty files.
+test2 - contained integers and ended on a comma ',' (empty token). Tested handling of ending with empty tokens.
+test3 - contained integers and ended on a comma ',' (empty token). Tested sorting while handling empty token ending.
+test4 - contained alpha tokens, integer tokens, and mixed tokens. Included random whitespaces to test whitespace removal.
+test5 - contained only commas, or only contained empty tokens. Tested handling of empty tokens and empty token ending.
+test6 - contained commas and ended with 1. Tested handling of empty tokens while containing valid characters.
+test7 - contained alpha tokens with whitespaces, empty tokens, and invalid characters (&). Tested handling of invalid characters.
+test8 - contained alpha tokens, one with a dash '-' in front. Tested handling of invalid characters. 
+test9 - contained alpha tokens, with dash '-' only token. Tested handling of invalid characters.
+test10 - contained alpha tokens and valid negative integer token. Tested handling of valid dashes.
+test11 - contained alpha tokens, and integer token with dash '-' in the center. Tested handling of invalid dashes.
+test12 - contained alpha tokens, and alpha token with dash '-' in the center. Tested handling of invalid dashes.
+test13 - contained one large alpha token. Tested handling of very large tokens.
+test14 - contained one large integer token. Tested handling of very large tokens.
+test15 - contained several integer tokens. Used for testing sorting functions and comparators
+test16 - contained several alpha tokens, with one integer token. Used for testing sorting functions and comparators.
+test17 - contained several integer tokens with zeroes appended to the front. Used to test token formating and integer token length limit.
+test18 - contained several empty tokens, whitespaces, and integer tokens. Tested converting empty tokens to integers.
+test19 - contained several empty tokens, whitespaces, and alpha tokens. Tested converting empty tokens to strings.
+
+
+We also tested error handling related to the arguments.
+-no arguments
+-invalid sort type
+-missing sort type
+-missing file name
+-file name does not exist
