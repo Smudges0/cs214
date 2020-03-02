@@ -1,0 +1,67 @@
+void swapValue(Node *a, Node *b)
+{
+  if (!a->isString)
+  {
+    int t = *(a->tokenInt);
+    *(a->tokenInt) = *(b->tokenInt);
+    *(b->tokenInt) = t;
+  }
+  else
+  {
+    char *t = a->tokenStr;
+    a->tokenStr = b->tokenStr;
+    b->tokenStr = t;
+  }
+}
+
+int quickSort(void *toSort, int (*comparator)(void *, void *))
+{
+  Node *head = (Node *)toSort;
+  Node *tail = lastNode(toSort);
+  _quickSort(head, tail, comparator);
+
+  //printf("%d\n", comparator(getToken(head), getToken(head->nextNode)));
+}
+
+void _quickSort(Node *head, Node *tail, int (*comparator)(void *, void *))
+{
+  if (tail != NULL && head != tail && head != tail->nextNode)
+  {
+    Node *p = partition(head, tail, comparator);
+    _quickSort(head, p->prevNode, comparator);
+    _quickSort(p->nextNode, tail, comparator);
+  }
+}
+
+Node *partition(Node *head, Node *tail, int (*comparator)(void *, void *))
+{
+  // set pivot as l element
+  void *x = getToken(head);
+
+  // similar to i = l-1 for array implementation
+  Node *i = tail->nextNode;
+
+  // Similar to "for (int j = l; j <= h- 1; j++)"
+  for (Node *j = tail; j != head; j = j->prevNode)
+  {
+    if (comparator(getToken(j), x) >= 0)
+    {
+      // Similar to i++ for array
+      i = (i == NULL) ? tail : i->prevNode;
+
+      swapValue(i, j);
+    }
+  }
+  i = (i == NULL) ? tail : i->prevNode; // Similar to i++
+  swapValue(i, head);
+  return i;
+}
+
+Node *lastNode(Node *tail)
+{
+  while (tail && tail->nextNode)
+  {
+    tail = tail->nextNode;
+  }
+  return tail;
+}
