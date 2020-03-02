@@ -768,7 +768,8 @@ int setFileType(char *token)
       return 1;
     }
   }
-  if (hasNumber && (strlen(token) > sizeof(int)))
+  if (hasNumber && (strlen(token) > 10)) // Max integer is ~2.1 billion, which is 10 digits long. If we get 11 digits, it is too big.
+                                         // However, there are ~900 million numbers that are 10 digits long, but still too big.
   {
     fprintf(stderr, "Number is too large for integer.\n");
     return 1;
