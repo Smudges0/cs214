@@ -1,0 +1,50 @@
+int quickSort(void *toSort, int (*comparator)(void *, void *))
+{
+  Node *head = (Node *)toSort;
+  Node *last = (Node *)toSort;
+  while (last && last->nextNode){
+      last = last->nextNode;
+  }
+  _quickSort(head, last);
+  
+  //printf("%d\n", comparator(getToken(head), getToken(head->nextNode)));
+}
+
+void _quickSort(Node* h, Node* l){
+    if (h!= NULL && l != h && l !=h->nextNode){
+        
+        Node *p = partition(h,l);
+        //printNodes(p);
+        // printf("what is p: %s\n", p->tokenStr);
+        // printf("what is p: %s\n", p->prevNode->tokenStr);
+        // printf("what is h: %s\n", h->tokenStr);
+        _quickSort(h, p->prevNode);
+        _quickSort(p->nextNode, l);
+    }
+}
+
+Node *partition(Node *h, Node *l){
+     void* x = getToken(h);
+     Node* i = l->nextNode;
+     Node* j;
+     
+     for(j = l; j!= h; j = j->prevNode){
+         if (stringComparator(getToken(j), x) > 0){
+            if (i == NULL){
+                i = l;
+              } else {
+                i = i->prevNode;
+              }
+            
+            swap(j, i);
+         }
+     }
+     if (i == NULL){
+       i = l;
+     } else {
+       i = i->prevNode;
+     }
+    //printf("start: %s\n", getToken(i));
+    swap(i,h);
+    return i;
+}

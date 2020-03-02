@@ -46,6 +46,12 @@ static int hasNumber = 0;
 
 int main(int argc, char *argv[])
 {
+
+  if (argc != 3)
+  {
+    fprintf(stderr, "Incorrect number of arguments. Use sort type(-i or -q) then file name.\n");
+    exit(EXIT_FAILURE);
+  }
   // Variables
   char *sortType = argv[1];
   char *fileName = argv[2];
@@ -56,12 +62,17 @@ int main(int argc, char *argv[])
   if (!((sortType[0] == '-') && (sortType[1] == 'q' || sortType[1] == 'i')))
   {
     fprintf(stderr, "Invalid sort type: %s.\n", sortType);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   
   // 2. Read tokens from file, put tokens into linked list, returns list
   Node *headRef = NULL;
   readFile(fileName, &headRef);
+  if (!headRef)
+  {
+    fprintf(stderr, "No valid tokens. Tokens must be integers or strings.\n");
+    exit(EXIT_FAILURE);
+  }
   printf("Before sort:\n");
   printNodes(headRef);
 
@@ -397,6 +408,7 @@ void *getToken(Node *node)
 
 Node *changeHeadPtr(Node *head)
 {
+  if (!head) return NULL;
   while (head->prevNode != NULL)
   {
     head = head->prevNode;
@@ -533,17 +545,14 @@ void removeNode(Node **head, Node *removedNode)
 
 void printNodes(Node *aNode)
 {
-  if (aNode->isString)
+  while (aNode)
   {
-    while (aNode)
+    if (aNode->isString)
     {
       printf("%s\n", aNode->tokenStr);
       aNode = aNode->nextNode;
     }
-  }
-  else
-  {
-    while (aNode)
+    else
     {
       printf("%d\n", *(aNode->tokenInt));
       aNode = aNode->nextNode;
@@ -553,20 +562,22 @@ void printNodes(Node *aNode)
 
 void freeNodes(Node *aNode)
 {
-    Node *nextNode = aNode->nextNode;
-    if (aNode->isString)
-    {
-      free(aNode->tokenStr);
-    }
-    else 
-    {
-      free(aNode->tokenInt);
-    }
-    free(aNode);
-    if (nextNode)
-    {
-      freeNodes(nextNode);
-    }
+  if (!aNode) return;
+
+  Node *nextNode = aNode->nextNode;
+  if (aNode->isString)
+  {
+    free(aNode->tokenStr);
+  }
+  else 
+  {
+    free(aNode->tokenInt);
+  }
+  free(aNode);
+  if (nextNode)
+  {
+    freeNodes(nextNode);
+  }
 }
 // -------------------------------------------
 // Read from File
@@ -579,7 +590,7 @@ void readFile(char *fileName, Node **headRef)
   int fd = open(fileName, O_RDONLY);
   if (fd == -1)
   {
-    printf("Error Number % d\n", errno);
+    perror("File Read Error");
     exit(EXIT_FAILURE);
   }
 

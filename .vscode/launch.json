@@ -35,7 +35,7 @@
       "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
       "args": [
         "-i",
-        "./testCases/test15.txt"
+        "./testCases/test1.txt"
       ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
