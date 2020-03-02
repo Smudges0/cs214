@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
   char *fileName = argv[2];
 
   // 1. Read args from command line (sort type, file name) and set flags
-  printf("Arguments: %s, %s\n\n", sortType, fileName);
+  //printf("Arguments: %s, %s\n\n", sortType, fileName);
 
   if (!((sortType[0] == '-') && (sortType[1] == 'q' || sortType[1] == 'i')))
   {
@@ -73,8 +73,8 @@ int main(int argc, char *argv[])
     fprintf(stderr, "No valid tokens. Tokens must be integers or strings.\n");
     exit(EXIT_FAILURE);
   }
-  printf("Before sort:\n");
-  printNodes(headRef);
+  //printf("Before sort:\n");
+  //printNodes(headRef);
 
   // 3. Chose comparator based on isString flag, set pointer to correct comparator
   void *comparator = NULL;
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
   }
 
   headRef = changeHeadPtr(headRef);
-  printf("After sort:\n");
+  //printf("After sort:\n");
   printNodes(headRef);
 
   // Implement comparators
@@ -649,7 +649,7 @@ void readFile(char *fileName, Node **headRef)
     {
       /* time to make it bigger */
       tokenBufSize += 10;
-      printf("-----Growing %d-----", tokenBufSize);
+      //printf("-----Growing %d-----", tokenBufSize);
       char *tokenBuf2 = realloc(tokenBuf, tokenBufSize);
       if (tokenBuf2 == NULL)
       {
@@ -662,7 +662,7 @@ void readFile(char *fileName, Node **headRef)
       else tokenBuf = tokenBuf2;
     }
 
-    printf("%.*s", bytes_read, readBuf);
+    //printf("%.*s", bytes_read, readBuf);
     // Actually reading one char at a time....
     char aChar = readBuf[0];
     // If end of the token is reached, check if it is a valid number or string token.
@@ -671,13 +671,13 @@ void readFile(char *fileName, Node **headRef)
       emptyFile = 0; // Differentiate between empty file and empty token at end of file
 
       // Ignore empty tokens
-      if (tokenLength == 0)
-      {
-        continue;
-      }
+      // if (tokenLength == 0)
+      // {
+      //   continue;
+      // }
 
       tokenBuf[tokenLength++] = '\0'; // Add string delimiter
-      printf("\nFound token: [%s]\n", tokenBuf);
+      //printf("\nFound token: [%s]\n", tokenBuf);
 
       // Check if token is number or string or other illegal
 
@@ -717,19 +717,19 @@ void readFile(char *fileName, Node **headRef)
       close(fd);
       exit(EXIT_FAILURE);
     }
-    printf("\n\nEnd of file: tokenLength = %d  Leftover token [%s]", tokenLength, tokenBuf);
+    //printf("\n\nEnd of file: tokenLength = %d  Leftover token [%s]", tokenLength, tokenBuf);
   }
-  else
-  {
-    if (emptyFile)
-    {
-      fprintf(stderr, "File is empty.\n");
-    }
-    else
-    {
-      fprintf(stderr, "File ends with empty token.\n");
-    }
-  }
+  // else
+  // {
+  //   if (emptyFile)
+  //   {
+  //     fprintf(stderr, "File is empty.\n");
+  //   }
+  //   else
+  //   {
+  //     fprintf(stderr, "File ends with empty token. Ignoring.\n");
+  //   }
+  // }
   if (hasNumber)
   {
     getNumList(headRef);
