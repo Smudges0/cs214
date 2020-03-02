@@ -12,6 +12,8 @@ int numComparator(void *, void *);
 int stringComparator(void *, void *);
 int setFileType(char *token);
 
+
+
 typedef struct node
 {
   char *tokenStr;
@@ -21,10 +23,6 @@ typedef struct node
   struct node *prevNode;
 } Node;
 
-void swapValue(Node *a, Node *b);
-void _quickSort(Node *last, Node *head, int (*comparator)(void *, void *));
-Node *partition(Node *l, Node *h, int (*comparator)(void *, void *));
-Node *lastNode(Node *root);
 void getNumList(Node **headRef);
 void readFile(char *fileName, Node **headRef);
 Node *makeNodeStr(char *token);
@@ -38,6 +36,9 @@ void insertNodeAfter(Node **head, Node *prevNode, Node *newNode);
 void removeNode(Node **head, Node *removedNode);
 void insertNodeBefore(Node **head, Node *nextNode, Node *newNode);
 void freeNodes(Node *aNode);
+void _quickSort(Node* h, Node* l,int (*comparator)(void *, void *));
+Node *partition(Node *h, Node *l,int (*comparator)(void *, void *));
+void swapValue(Node *a, Node *b);
 
 const int ISSTRING = 1;
 const int ISNUM = 0;
@@ -64,7 +65,7 @@ int main(int argc, char *argv[])
     fprintf(stderr, "Invalid sort type: %s.\n", sortType);
     exit(EXIT_FAILURE);
   }
-  
+
   // 2. Read tokens from file, put tokens into linked list, returns list
   Node *headRef = NULL;
   readFile(fileName, &headRef);
@@ -277,74 +278,6 @@ int insertionSort(void *toSort, int (*comparator)(void *, void *))
   }
 }
 
-void swapValue(Node *a, Node *b)
-{
-  if (!a->isString)
-  {
-    int t = *(a->tokenInt);
-    *(a->tokenInt) = *(b->tokenInt);
-    *(b->tokenInt) = t;
-  }
-  else
-  {
-    char *t = a->tokenStr;
-    a->tokenStr = b->tokenStr;
-    b->tokenStr = t;
-  }
-}
-
-int quickSort(void *toSort, int (*comparator)(void *, void *))
-{
-  Node *head = (Node *)toSort;
-  Node *tail = lastNode(toSort);
-  _quickSort(head, tail, comparator);
-
-  //printf("%d\n", comparator(getToken(head), getToken(head->nextNode)));
-}
-
-void _quickSort(Node *head, Node *tail, int (*comparator)(void *, void *))
-{
-  if (tail != NULL && head != tail && head != tail->nextNode)
-  {
-    Node *p = partition(head, tail, comparator);
-    _quickSort(head, p->prevNode, comparator);
-    _quickSort(p->nextNode, tail, comparator);
-  }
-}
-
-Node *partition(Node *head, Node *tail, int (*comparator)(void *, void *))
-{
-  // set pivot as l element
-  void *x = getToken(head);
-
-  // similar to i = l-1 for array implementation
-  Node *i = tail->nextNode;
-
-  // Similar to "for (int j = l; j <= h- 1; j++)"
-  for (Node *j = tail; j != head; j = j->prevNode)
-  {
-    if (comparator(getToken(j), x) >= 0)
-    {
-      // Similar to i++ for array
-      i = (i == NULL) ? tail : i->prevNode;
-
-      swapValue(i, j);
-    }
-  }
-  i = (i == NULL) ? tail : i->prevNode; // Similar to i++
-  swapValue(i, head);
-  return i;
-}
-
-Node *lastNode(Node *tail)
-{
-  while (tail && tail->nextNode)
-  {
-    tail = tail->nextNode;
-  }
-  return tail;
-}
-
 // -------------------------------------------
 // Comparators
 //--------------------------------------------
@@ -408,7 +341,8 @@ void *getToken(Node *node)
 
 Node *changeHeadPtr(Node *head)
 {
-  if (!head) return NULL;
+  if (!head)
+    return NULL;
   while (head->prevNode != NULL)
   {
     head = head->prevNode;
@@ -562,14 +496,15 @@ void printNodes(Node *aNode)
 
 void freeNodes(Node *aNode)
 {
-  if (!aNode) return;
+  if (!aNode)
+    return;
 
   Node *nextNode = aNode->nextNode;
   if (aNode->isString)
   {
     free(aNode->tokenStr);
   }
-  else 
+  else
   {
     free(aNode->tokenInt);
   }
@@ -659,7 +594,8 @@ void readFile(char *fileName, Node **headRef)
         close(fd);
         exit(EXIT_FAILURE);
       }
-      else tokenBuf = tokenBuf2;
+      else
+        tokenBuf = tokenBuf2;
     }
 
     //printf("%.*s", bytes_read, readBuf);
@@ -804,3 +740,81 @@ void getNumList(Node **headRef)
   //freeList(*headRef);
   *headRef = numList;
 }
+
+// -------------------------------------------
+// Quicksort
+//--------------------------------------------
+
+int quickSort(void *toSort, int (*comparator)(void *, void *))
+{
+	Node *head = (Node *)toSort;
+  if (head!=NULL){
+    
+    Node *last = (Node *)toSort;
+      while (last && last->nextNode){
+      last = last->nextNode;
+	  }
+  
+  _quickSort(head, last, comparator);
+  } 
+
+}
+
+void _quickSort(Node* h, Node* l, int (*comparator)(void *, void *)){
+    if (h != NULL && l != h && l !=h->prevNode){
+        
+        Node *p = partition(h,l,comparator);
+        // printf("------\n");
+        // printNodes(p);
+        //printf("------\n");
+        // printf("what is p: %s\n", p->tokenStr);
+        // printf("what is p: %s\n", p->prevNode->tokenStr);
+        // printf("what is h: %s\n", h->tokenStr);
+        _quickSort(p->nextNode,l,comparator);
+        _quickSort(h, p->prevNode, comparator); 
+    }
+}
+
+Node *partition(Node *h, Node *l,int (*comparator)(void *, void *)){
+     void* x = getToken(h);
+     Node* i = l->nextNode;
+     Node* j;
+     
+     for(j = l; j!= h; j = j->prevNode){
+          if (comparator(getToken(j), x) > 0){
+            if (i == NULL){
+                i = l;
+              } else {
+                i = i->prevNode;
+              }
+            swapValue(j, i);
+         }
+     }
+     if (i == NULL){
+       i = l;
+     } else {
+       i = i->prevNode;
+     }
+    //printf("start: %s\n", getToken(i));
+    swapValue(i,h);
+    return i;
+}
+
+void swapValue(Node *a, Node *b)
+{
+  if (!a->isString)
+  {
+    int t = *(a->tokenInt);
+    *(a->tokenInt) = *(b->tokenInt);
+    *(b->tokenInt) = t;
+  }
+  else
+  {
+    char *t = a->tokenStr;
+    a->tokenStr = b->tokenStr;
+    b->tokenStr = t;
+  }
+}
+
+
+
