@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "readfilebb.h": "c",
+    "readuncompressedfile.h": "c",
+    "huffmantree.h": "c"
+  }
+}
