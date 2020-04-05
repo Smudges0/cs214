@@ -2,13 +2,13 @@ CC = gcc # set compiler
 CFLAGS = -g # add debugging to executable, turn on all compiler warnings
 
 .PHONY: all # in case there's a file called 'all'
-all: testProgram
+all: fileCompressor
 
-testProgram: main.o huffmanTree.o readBuildCodebook.o printFunctions.o readFromCodebook.o translate.o readToEncode.o readToDecode.o recursiveMode.o
-	$(CC) $(CFLAGS) -o testProgram main.o huffmanTree.o readBuildCodebook.o printFunctions.o readFromCodebook.o translate.o readToEncode.o readToDecode.o recursiveMode.o
+fileCompressor: fileCompressor.o huffmanTree.o readBuildCodebook.o printFunctions.o readFromCodebook.o translate.o readToEncode.o readToDecode.o recursiveMode.o
+	$(CC) $(CFLAGS) -o fileCompressor fileCompressor.o huffmanTree.o readBuildCodebook.o printFunctions.o readFromCodebook.o translate.o readToEncode.o readToDecode.o recursiveMode.o
 
-main.o: main.c printFunctions.h huffmanTree.h readBuildCodebook.h readFromCodebook.h readToEncode.h readToDecode.h
-	$(CC) $(CFLAGS) -c main.c
+fileCompressor.o: fileCompressor.c printFunctions.h huffmanTree.h readBuildCodebook.h readFromCodebook.h readToEncode.h readToDecode.h
+	$(CC) $(CFLAGS) -c fileCompressor.c
 
 printFunctions.o: printFunctions.c printFunctions.h huffmanTree.h
 	$(CC) $(CFLAGS) -c printFunctions.c
@@ -38,4 +38,4 @@ recursiveMode.o: recursiveMode.c recursiveMode.h huffmanTree.h
 	$(CC) $(CFLAGS) -c recursiveMode.c
 
 clean:
-	rm testProgram main.o huffmanTree.o readBuildCodebook.o printFunctions.o readFromCodebook.o translate.o readToEncode.o readToDecode.o recursiveMode.o
+	rm fileCompressor fileCompressor.o huffmanTree.o readBuildCodebook.o printFunctions.o readFromCodebook.o translate.o readToEncode.o readToDecode.o recursiveMode.o
