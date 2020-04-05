@@ -25,7 +25,7 @@ void callRecursively(char *basePath, HeapNode **headRef, void (*readFunction)(ch
 
   while ((directoryEntry = readdir(directory)) != NULL)
   {
-    printf("%s %ld\n", directoryEntry->d_name, strlen(directoryEntry->d_name));
+    // printf("%s %ld\n", directoryEntry->d_name, strlen(directoryEntry->d_name));
     if (strcmp(directoryEntry->d_name, ".") == 0 || strcmp(directoryEntry->d_name, "..") == 0) // Ignore . and .. directories.
     {
       continue;
@@ -47,7 +47,7 @@ void callRecursively(char *basePath, HeapNode **headRef, void (*readFunction)(ch
     if (!strcmp(flag, "-b") || !strcmp(flag, "-c")) // if building codebook
     {
       // if file ends in .txt
-      printf("%s\n", getExtension(directoryEntry->d_name));
+      // printf("%s\n", getExtension(directoryEntry->d_name));
       if (strcmp(getExtension(directoryEntry->d_name), "txt") == 0)
       {
         readFunction(newPathName, headRef); // readBuildCodebook(basepath, headRef); or readToEncode(basePath, &headRef)

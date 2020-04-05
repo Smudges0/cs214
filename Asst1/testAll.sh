@@ -8,6 +8,8 @@ rm -rf $TESTDIR/*.hcz
 rm -rf $TESTDIR/*.hcz.txt
 rm -rf HuffmanCodebook
 rm -rf ./testoutput
+
+
 mkdir ./testoutput
 
 # build, compress, decompress and compare.
@@ -16,14 +18,24 @@ do
   echo "Processing test file $f"
   # take action on each file. $f store current file name
   bf=$(basename $f)
-  fh=${f%.txt}.hcz
-  echo "$EXE -b $f > ./testoutput/output_b_$bf 2>&1"
+  #fh=${f%.txt}.hcz // Replaces .txt with .hcz - Not what the program does...
+  fh=$f.hcz
 
+  #echo "$EXE -b $f > ./testoutput/output_b_$bf 2>&1"
   $EXE -b $f > ./testoutput/output_b_$bf 2>&1
-  # $EXE -c $f ./HuffmanCode > ./testoutput/output_c_$bf 2>&1
-  # $EXE -d $fh ./HuffmanCode > ./testoutput/output_d_$bf 2>&1
-  # diff $f $fh.txt
+
+  #echo "$EXE -c $f ./HuffmanCodebook > ./testoutput/output_c_$bf 2>&1"
+  $EXE -c $f ./HuffmanCodebook > ./testoutput/output_c_$bf 2>&1
+
+  #echo "$EXE -d $fh ./HuffmanCodebook > ./testoutput/output_d_$bf 2>&1"
+  $EXE -d $fh ./HuffmanCodebook > ./testoutput/output_d_$bf 2>&1
+
+  echo "Comparing: diff $f $fh.txt"
+  diff $f $fh.txt
+
   #diff output_i_$bf expected_i_$bf
+
+  echo -e "\n"
 done
 
 # echo "Testing bad arguments: No args"

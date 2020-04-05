@@ -32,11 +32,6 @@ void readToEncode(char *fileName, HeapNode **headRef)
     exit(EXIT_FAILURE);
   }
 
-  if (strcmp(fileName, "./testcases/test3.txt") == 0)
-  {
-    printf("Breakpoint\n");
-  }
-
   char *whiteSpace = (char *)malloc(sizeof(char) * 2); // Hold whitespace. Write word first, then write whitespace.
   while (1)
   {
@@ -74,7 +69,7 @@ void readToEncode(char *fileName, HeapNode **headRef)
       char *tokenBuf2 = realloc(tokenBuf, tokenBufSize);
       if (tokenBuf2 == NULL)
       {
-        printf("out of memory for tokenBuf realloc\n");
+        printf("Out of memory for tokenBuf realloc\n");
         free(readBuf);
         free(tokenBuf);
         close(fd);

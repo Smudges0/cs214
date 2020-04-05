@@ -21,7 +21,7 @@ void readToDecode(char *fileName, HeapNode **codeTreeHead)
 
   int decodeFile = open(outputFileName, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
   HeapNode *currentNode = *codeTreeHead;
-  printf("%s\n", fileName);
+  // printf("%s\n", fileName);
   while (1)
   {
     bytes_read = read(fd, readBuf, readBufSize);

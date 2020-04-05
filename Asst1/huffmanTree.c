@@ -16,11 +16,14 @@ HeapNode *newNode(char *token, unsigned count)
   HeapNode *aNode = (HeapNode *)malloc(sizeof(HeapNode));
   aNode->left = NULL;
   aNode->right = NULL;
+  aNode->code = NULL;
+  aNode->token = NULL;
   if (token)
   {
     aNode->token = malloc(sizeof(char) * strlen(token) + 1);
     strcpy(aNode->token, token);
   }
+
   aNode->count = count;
 
   return aNode;
@@ -31,6 +34,8 @@ HeapNode *newCodeNode(char *code, char *token)
   HeapNode *aNode = (HeapNode *)malloc(sizeof(HeapNode));
   aNode->left = NULL;
   aNode->right = NULL;
+  aNode->code = NULL;
+  aNode->token = NULL;
   if (code)
   {
     aNode->code = malloc(sizeof(char) * strlen(code) + 1);
