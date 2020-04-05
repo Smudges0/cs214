@@ -58,6 +58,11 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
+			if (doBuild + doCompress + doDecompress > 1)
+			{
+				printf("Too many flags. Please use -b, -c, and -d by themselves or with -R\n");
+				exit(EXIT_FAILURE);
+			}
 			if (doBuild)
 			{
 				fileName = argv[i];
@@ -100,7 +105,8 @@ int main(int argc, char *argv[])
 			readBuildCodebook(fileName, &headRef);
 		}
 
-		buildHuffmanCodes(headRef, listLength(headRef));
+		buildHuffmanCodes(&headRef, listLength(headRef));
+		freeAllNodes(headRef);
 	}
 
 	if (doCompress) // this one needs a codebook AND a file
@@ -115,6 +121,8 @@ int main(int argc, char *argv[])
 		{
 			readToEncode(fileName, &headRef);
 		}
+
+		freeAllNodes(headRef);
 	}
 
 	if (doDecompress) // needs codebook AND file
@@ -131,6 +139,8 @@ int main(int argc, char *argv[])
 		{
 			readToDecode(fileName, &codeTreeHead);
 		}
+
+		freeAllNodes(codeTreeHead);
 	}
 
 	// printNodes(headRef);

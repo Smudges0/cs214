@@ -30,7 +30,7 @@ int isLeaf(HeapNode *aNode);
 MinHeap *initMinHeap(HeapNode *head, int capacity);
 int treeHeight(HeapNode *aNode);
 HeapNode *huffmanTree(HeapNode *head, int size);
-void buildHuffmanCodes(HeapNode *head, int size);
+void buildHuffmanCodes(HeapNode **head, int size);
 void codeWordList(HeapNode **head, char *code, char *word, char escapeChar);
 
 HeapNode *newCodeNode(char *code, char *word);
@@ -40,4 +40,6 @@ void printHuffmanCode(int fd, int code[], int length, char *token);
 void printCodeFile(HeapNode *root, int code[], int top, int fd);
 void printNodes(HeapNode *aNode);
 int listLength(HeapNode *aNode);
+
+void freeAllNodes(HeapNode *head);
 #endif

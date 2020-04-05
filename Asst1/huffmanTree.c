@@ -222,23 +222,24 @@ int treeHeight(HeapNode *aNode)
   }
 }
 
-void buildHuffmanCodes(HeapNode *head, int size)
+void buildHuffmanCodes(HeapNode **head, int size)
 {
   HeapNode *root;
   if (size == 0) // If File is empty, insert a completely blank node
   {
     HeapNode *zeroNode = newNode("", 0);
-    root = zeroNode;
+    *head = zeroNode;
   }
   else if (size == 1) // If size is one, insert an empty node and insert the real node as it's left child
   {
-    HeapNode *noToken = newNode(NULL, head->count);
-    noToken->left = head;
-    root = noToken;
+    HeapNode *noToken = newNode(NULL, (*head)->count);
+    noToken->left = *head;
+    *head = noToken;
   }
   else // Else, build huffman tree normally
   {
-    root = huffmanTree(head, size);
+    root = huffmanTree(*head, size);
+    *head = root;
   }
 
   int top = 0;
@@ -251,7 +252,7 @@ void buildHuffmanCodes(HeapNode *head, int size)
   }
 
   write(fd, "\\\n", 2);
-  printCodeFile(root, arr, top, fd);
+  printCodeFile(*head, arr, top, fd);
 }
 
 void codeWordList(HeapNode **head, char *code, char *word, char escapeChar)
@@ -293,6 +294,13 @@ void recreateTree(HeapNode **codeTreeHead, HeapNode *headOfList)
 
   while (currentListNode) // Go down the list and insert nodes into tree
   {
+    // ONLY GET HERE IF WE READ NOTHING FROM THE CODEBOOK. THERE IS AN EMPTY WORD IN THE LIST, CODE "" AND TOKEN ""
+    // Need to break here, or will loop infinitely
+    if (strlen(currentListNode->token) == 0)
+    {
+      break;
+    }
+
     for (int i = 0; i < strlen(currentListNode->code); i++) // Loop over code in currentListNode
     {
       if (i != strlen(currentListNode->code) - 1) // If not at end of code, insert blank node at left/right in tree
@@ -350,8 +358,29 @@ void recreateTree(HeapNode **codeTreeHead, HeapNode *headOfList)
         break;
       }
     }
-    // ONLY GET HERE IF WE READ NOTHING FROM THE CODEBOOK. THERE IS AN EMPTY WORD IN THE LIST, CODE "" AND TOKEN ""
-    // Need to break here, or will loop infinitely
-    break;
   }
+}
+
+void freeAllNodes(HeapNode *head)
+{
+  if (head->left) // check for left child
+  {
+    freeAllNodes(head->left); // go to left child
+  }
+  if (head->right) // check for right child
+  {
+    freeAllNodes(head->right); // go to right child
+  }
+
+  // Free token/code if applicable
+  if (head->code)
+  {
+    free(head->code);
+  }
+  if (head->token)
+  {
+    free(head->token);
+  }
+
+  free(head);
 }
