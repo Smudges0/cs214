@@ -18,7 +18,7 @@ HeapNode *newNode(char *token, unsigned count)
   aNode->right = NULL;
   if (token)
   {
-    aNode->token = malloc(strlen(token));
+    aNode->token = malloc(sizeof(char) * strlen(token) + 1);
     strcpy(aNode->token, token);
   }
   aNode->count = count;
@@ -33,12 +33,12 @@ HeapNode *newCodeNode(char *code, char *token)
   aNode->right = NULL;
   if (code)
   {
-    aNode->code = malloc(strlen(code));
+    aNode->code = malloc(sizeof(char) * strlen(code) + 1);
     strcpy(aNode->code, code);
   }
   if (token)
   {
-    aNode->token = malloc(strlen(token));
+    aNode->token = malloc(sizeof(char) * strlen(token) + 1);
     strcpy(aNode->token, token);
   }
 
@@ -276,7 +276,74 @@ void codeWordList(HeapNode **head, char *code, char *word, char escapeChar)
   //(*head)->left = prevNode->right;     // Make head node have a pointer to the last node.
 }
 
-void recreateTree(HeapNode **head, char *code, char *word)
+void recreateTree(HeapNode **codeTreeHead, HeapNode *headOfList)
 {
-  printf("%s %s\n", code, word);
+  HeapNode *currentTreeNode = *codeTreeHead;
+  HeapNode *currentListNode = headOfList;
+  HeapNode *nextInList;
+
+  // Create a blank node to start the tree
+  currentTreeNode = newCodeNode(NULL, NULL);
+  *codeTreeHead = currentTreeNode;
+
+  while (currentListNode) // Go down the list and insert nodes into tree
+  {
+    for (int i = 0; i < strlen(currentListNode->code); i++) // Loop over code in currentListNode
+    {
+      if (i != strlen(currentListNode->code) - 1) // If not at end of code, insert blank node at left/right in tree
+      {
+        if (currentListNode->code[i] == '0') // LEFT
+        {
+          if (currentTreeNode->left) // if left node already exists, go to that node
+          {
+            currentTreeNode = currentTreeNode->left;
+            continue;
+          }
+          else // if doesn't exist, make node and go to it
+          {
+            currentTreeNode->left = newCodeNode(NULL, NULL);
+            currentTreeNode = currentTreeNode->left;
+            continue;
+          }
+        }
+        else // RIGHT
+        {
+          if (currentTreeNode->right) // if right node exists, go to it
+          {
+            currentTreeNode = currentTreeNode->right;
+            continue;
+          }
+          else // if doesn't exist, make node and go to it
+          {
+            currentTreeNode->right = newCodeNode(NULL, NULL);
+            currentTreeNode = currentTreeNode->right;
+            continue;
+          }
+        }
+      }
+      else // If at end of code, insert currentListNode into tree at left/right
+      {
+        if (currentListNode->code[i] == '0')
+        {
+          currentTreeNode->left = currentListNode;
+          currentTreeNode = currentTreeNode->left;
+        }
+        else
+        {
+          currentTreeNode->right = currentListNode;
+          currentTreeNode = currentTreeNode->right;
+        }
+        nextInList = currentListNode->right;
+        // Remove pointers from node to make it a leaf
+        currentTreeNode->left = NULL;
+        currentTreeNode->right = NULL;
+        // Once at end of code, move on to next node in the list
+        currentListNode = nextInList;
+        // printf("1. %s %s\n", currentTreeNode->code, currentTreeNode->token);
+        // Reset currentTreeNode back to top of the tree
+        currentTreeNode = *codeTreeHead;
+        break;
+      }
+    }
+  }
 }

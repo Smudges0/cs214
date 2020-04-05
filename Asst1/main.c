@@ -6,19 +6,22 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <sys/stat.h>
+#include <dirent.h>
 
 #include "printFunctions.h"
 #include "huffmanTree.h"
 #include "readBuildCodebook.h"
 #include "readFromCodebook.h"
 #include "readToEncode.h"
+#include "readToDecode.h"
+#include "recursiveMode.h"
 
 int main(int argc, char *argv[])
 {
 
 	if (argc < 3 || argc > 5)
 	{
-		fprintf(stderr, "Incorrect number of arguments.\n");
+		printf("Incorrect number of arguments.\n");
 		exit(EXIT_FAILURE);
 	}
 	// Variables
@@ -49,7 +52,7 @@ int main(int argc, char *argv[])
 				doDecompress = 1;
 				break;
 			default:
-				fprintf(stderr, "Invalid flag: %s. Valid flags are -R, -b, -c, or -d.\n", argv[i]);
+				printf("Invalid flag: %s. Valid flags are -R, -b, -c, or -d.\n", argv[i]);
 				exit(EXIT_FAILURE);
 			}
 		}
@@ -78,27 +81,60 @@ int main(int argc, char *argv[])
 					break;
 				}
 			}
-			fprintf(stderr, "Not enough arguments for flag.\nBuild takes filename or path, Compress and decompress take a filename or path and a codebook.\n");
+			printf("Not enough arguments for flag.\nBuild takes filename or path, Compress and decompress take a filename or path and a codebook.\n");
 			exit(EXIT_FAILURE);
 		}
 	}
 	// 2. Read tokens from file, put tokens into linked list, returns list
 	HeapNode *headRef = NULL;
+
 	if (doBuild)
 	{
-		readBuildCodebook(fileName, &headRef);
+		if (recursive)
+		{
+			// recursive function
+			callRecursively(fileName, &headRef, &readBuildCodebook, "-b");
+		}
+		else
+		{
+			readBuildCodebook(fileName, &headRef);
+		}
+
 		buildHuffmanCodes(headRef, listLength(headRef));
 	}
 
 	if (doCompress) // this one needs a codebook AND a file
 	{
 		readFromCodebook(codeBook, &headRef);
-		readToEncode(fileName, headRef);
+		if (recursive)
+		{
+			// recursive function
+			callRecursively(fileName, &headRef, &readToEncode, "-c");
+		}
+		else
+		{
+			readToEncode(fileName, &headRef);
+		}
 	}
 
+	if (doDecompress) // needs codebook AND file
+	{
+		HeapNode *codeTreeHead;
+		readFromCodebook(codeBook, &headRef);
+		recreateTree(&codeTreeHead, headRef);
+		if (recursive)
+		{
+			// recursive function
+			callRecursively(fileName, &codeTreeHead, &readToDecode, "-d");
+		}
+		else
+		{
+			readToDecode(fileName, &codeTreeHead);
+		}
+	}
 	if (!headRef)
 	{
-		fprintf(stderr, "No valid tokens.\n");
+		printf("No valid tokens.\n");
 		exit(EXIT_FAILURE);
 	}
 	// printNodes(headRef);

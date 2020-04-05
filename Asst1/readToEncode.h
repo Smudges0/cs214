@@ -3,6 +3,6 @@
 
 #include "huffmanTree.h"
 
-void readToEncode(char *fileName, HeapNode *headRef);
+void readToEncode(char *fileName, HeapNode **headRef);
 void encode(int encodeFile, HeapNode *head, char *word);
 #endif

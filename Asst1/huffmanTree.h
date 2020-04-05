@@ -34,7 +34,7 @@ void buildHuffmanCodes(HeapNode *head, int size);
 void codeWordList(HeapNode **head, char *code, char *word, char escapeChar);
 
 HeapNode *newCodeNode(char *code, char *word);
-void recreateTree(HeapNode **head, char *code, char *word);
+void recreateTree(HeapNode **codetreeHead, HeapNode *head);
 
 void printHuffmanCode(int fd, int code[], int length, char *token);
 void printCodeFile(HeapNode *root, int code[], int top, int fd);

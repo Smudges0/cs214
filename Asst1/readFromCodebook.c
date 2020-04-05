@@ -62,7 +62,7 @@ void readFromCodebook(char *fileName, HeapNode **headRef)
       char *tokenBuf2 = realloc(tokenBuf, tokenBufSize);
       if (tokenBuf2 == NULL)
       {
-        fprintf(stderr, "out of memory for tokenBuf realloc\n");
+        printf("out of memory for tokenBuf realloc\n");
         free(readBuf);
         free(tokenBuf);
         close(fd);
@@ -93,14 +93,14 @@ void readFromCodebook(char *fileName, HeapNode **headRef)
       if (aChar == '\t')
       {
         tokenBuf[tokenLength++] = '\0';
-        code = malloc(sizeof(tokenBuf));
+        code = malloc(sizeof(char) * strlen(tokenBuf) + 1);
         strcpy(code, tokenBuf);
         tokenLength = 0;
       }
       else if (aChar == '\n')
       {
         tokenBuf[tokenLength++] = '\0';
-        word = malloc(sizeof(tokenBuf));
+        word = malloc(sizeof(char) * strlen(tokenBuf) + 1);
         strcpy(word, tokenBuf);
         tokenLength = 0;
 

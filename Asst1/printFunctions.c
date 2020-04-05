@@ -15,7 +15,7 @@ void printHuffmanCode(int fd, int code[], int length, char *token)
   int i;
   //int bytes_written;
   int writeBufSize = 1;
-  char *writeBuf = malloc(writeBufSize);
+  char *writeBuf = malloc(sizeof(char) * writeBufSize);
 
   for (i = 0; i < length; ++i)
   {

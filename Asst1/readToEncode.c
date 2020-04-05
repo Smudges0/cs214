@@ -11,39 +11,13 @@
 #include "huffmanTree.h"
 #include "initReadFile.h"
 
-void readToEncode(char *fileName, HeapNode *headRef)
+void readToEncode(char *fileName, HeapNode **headRef)
 {
-  // INIT_READ(fileName);
-
-  int fd = open(fileName, O_RDONLY);
-  if (fd == -1)
-  {
-    perror("File Read Error");
-    exit(EXIT_FAILURE);
-  }
-  int tokenBufSize = 10;
-  char *tokenBuf = (char *)malloc(tokenBufSize);
-  if (tokenBuf == NULL)
-  {
-    fprintf(stderr, "out of memory for tokenBuf\n");
-    close(fd);
-    exit(EXIT_FAILURE);
-  }
-  int readBufSize = 1;
-  char *readBuf = (char *)malloc(readBufSize);
-  if (readBuf == NULL)
-  {
-    fprintf(stderr, "out of memory for readBuf\n");
-    close(fd);
-    exit(EXIT_FAILURE);
-  }
-  int bytes_read;
-  int tokenLength = 0;
-  int reachedEnd = 0;
+  INIT_READ(fileName);
 
   // Open file for writing encoded file to
   // char *hczExtension = ".hcz";
-  char *outputFileName = (char *)malloc(strlen(fileName) + 5);
+  char *outputFileName = (char *)malloc(sizeof(char) * (strlen(fileName) + 5));
   strcpy(outputFileName, fileName);
   strcat(outputFileName, ".hcz");
 
@@ -58,9 +32,15 @@ void readToEncode(char *fileName, HeapNode *headRef)
     exit(EXIT_FAILURE);
   }
 
-  char *whiteSpace = (char *)malloc(1); // Hold whitespace. Write word first, then write whitespace.
+  if (strcmp(fileName, "./testcases/test3.txt") == 0)
+  {
+    printf("Breakpoint\n");
+  }
+
+  char *whiteSpace = (char *)malloc(sizeof(char) * 2); // Hold whitespace. Write word first, then write whitespace.
   while (1)
   {
+
     bytes_read = read(fd, readBuf, readBufSize);
 
     if (bytes_read == EAGAIN)
@@ -94,7 +74,7 @@ void readToEncode(char *fileName, HeapNode *headRef)
       char *tokenBuf2 = realloc(tokenBuf, tokenBufSize);
       if (tokenBuf2 == NULL)
       {
-        fprintf(stderr, "out of memory for tokenBuf realloc\n");
+        printf("out of memory for tokenBuf realloc\n");
         free(readBuf);
         free(tokenBuf);
         close(fd);
@@ -124,24 +104,27 @@ void readToEncode(char *fileName, HeapNode *headRef)
         }
         // Write leftovers in tokenBuf
         tokenBuf[tokenLength++] = '\0';
-        encode(encodeFile, headRef, tokenBuf);
+        encode(encodeFile, *headRef, tokenBuf);
+        break;
       }
       // This will run if it's not EOF. We've hit whitespace
       if (tokenLength == 0) // Hit consecutive whitespace
       {
         // write whitespace to file
         whiteSpace[0] = aChar;
-        encode(encodeFile, headRef, whiteSpace);
+        whiteSpace[1] = '\0';
+        encode(encodeFile, *headRef, whiteSpace);
         continue;
       }
       // This will run if we hit end of token IE only if we pass all other checks.
       tokenBuf[tokenLength++] = '\0';
       // Save whitespace
       whiteSpace[0] = aChar;
+      whiteSpace[1] = '\0';
       // write tokenBuf to file
-      encode(encodeFile, headRef, tokenBuf);
+      encode(encodeFile, *headRef, tokenBuf);
       // write whitespace to file
-      encode(encodeFile, headRef, whiteSpace);
+      encode(encodeFile, *headRef, whiteSpace);
       tokenLength = 0;
     }
     else

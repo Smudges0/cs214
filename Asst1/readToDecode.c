@@ -7,17 +7,21 @@
 #include <ctype.h>
 #include <sys/stat.h>
 
-#include "readBuildCodebook.h"
+#include "readToDecode.h"
 #include "huffmanTree.h"
 #include "initReadFile.h"
-#include "translate.h"
 
-void readBuildCodebook(char *fileName, HeapNode **headRef)
+void readToDecode(char *fileName, HeapNode **codeTreeHead)
 {
   INIT_READ(fileName);
 
-  // Start reading the file
-  //while ((bytes_read = read(fd, readBuf, readBufSize) > 0))
+  char *outputFileName = malloc(sizeof(char) * strlen(fileName) + 5);
+  strcpy(outputFileName, fileName);
+  strcat(outputFileName, ".txt\0");
+
+  int decodeFile = open(outputFileName, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+  HeapNode *currentNode = *codeTreeHead;
+  printf("%s\n", fileName);
   while (1)
   {
     bytes_read = read(fd, readBuf, readBufSize);
@@ -35,6 +39,7 @@ void readBuildCodebook(char *fileName, HeapNode **headRef)
       free(readBuf);
       free(tokenBuf);
       close(fd);
+      close(decodeFile);
       exit(EXIT_FAILURE);
     }
     else if (bytes_read == 0)
@@ -56,6 +61,7 @@ void readBuildCodebook(char *fileName, HeapNode **headRef)
         free(readBuf);
         free(tokenBuf);
         close(fd);
+        close(decodeFile);
         exit(EXIT_FAILURE);
       }
       else
@@ -65,48 +71,44 @@ void readBuildCodebook(char *fileName, HeapNode **headRef)
     //printf("%.*s", bytes_read, readBuf);
     // Actually reading one char at a time....
     char aChar;
-    if (!reachedEnd)
+    if (!reachedEnd) // As long as we aren't at the end, add the character to the buffer
     {
       aChar = readBuf[0];
-    }
-
-    // If end of the token is reached, check if it is a valid number or string token.
-    if (reachedEnd || isspace(aChar) || iscntrl(aChar))
-    {
-      if (reachedEnd && tokenLength == 0)
+      // printf("Read character: %c\n", aChar);
+      if (aChar == '0') // LEFT
       {
-        break;
+        // printf("Going left\n");
+        currentNode = currentNode->left;
+      }
+      else if (aChar == '1')
+      {
+        // printf("Going right\n");
+        currentNode = currentNode->right;
+      }
+      else
+      {
+        printf("Invalid character in .hcz file\n");
+        exit(EXIT_FAILURE);
       }
 
-      // emptyFile = 0; // Differentiate between empty file and empty token at end of file
-      if (!reachedEnd)
+      if (isLeaf(currentNode)) // If not at end of code, follow code down tree until we get to correct node
       {
-        listFindAppend(headRef, fromCntrl(aChar));
+        // printf("Token matched: %s\n", currentNode->token);
+        write(decodeFile, currentNode->token, strlen(currentNode->token));
+        currentNode = *codeTreeHead; // Reset currentNode for next code
       }
-
-      // For multiple whitespaces in a row, continue
-      if (tokenLength == 0)
-      {
-        continue;
-      }
-
-      // Add word to list
-      tokenBuf[tokenLength++] = '\0'; // Add string delimiter
-      //printf("\nFound token: [%s]\n", tokenBuf);
-
-      listFindAppend(headRef, tokenBuf);
-
-      // Reset token pointer to 0 to read next token
-      tokenLength = 0;
     }
     else
     {
-      tokenBuf[tokenLength++] = aChar;
+      // printf("Reached End of file\n");
+      break;
     }
+
   } // End of file read
 
   //Cleanup on success
   free(readBuf);
   free(tokenBuf);
   close(fd);
+  close(decodeFile);
 }
