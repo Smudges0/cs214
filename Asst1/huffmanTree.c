@@ -225,13 +225,18 @@ int treeHeight(HeapNode *aNode)
 void buildHuffmanCodes(HeapNode *head, int size)
 {
   HeapNode *root;
-  if (size == 1)
+  if (size == 0) // If File is empty, insert a completely blank node
+  {
+    HeapNode *zeroNode = newNode("", 0);
+    root = zeroNode;
+  }
+  else if (size == 1) // If size is one, insert an empty node and insert the real node as it's left child
   {
     HeapNode *noToken = newNode(NULL, head->count);
     noToken->left = head;
     root = noToken;
   }
-  else
+  else // Else, build huffman tree normally
   {
     root = huffmanTree(head, size);
   }
@@ -345,5 +350,8 @@ void recreateTree(HeapNode **codeTreeHead, HeapNode *headOfList)
         break;
       }
     }
+    // ONLY GET HERE IF WE READ NOTHING FROM THE CODEBOOK. THERE IS AN EMPTY WORD IN THE LIST, CODE "" AND TOKEN ""
+    // Need to break here, or will loop infinitely
+    break;
   }
 }

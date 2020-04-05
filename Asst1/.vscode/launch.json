@@ -10,9 +10,8 @@
       "request": "launch",
       "program": "${fileDirname}/testProgram",
       "args": [
-        "-R",
-        "-c",
-        "./testcases",
+        "-d",
+        "./testcases/test2.txt.hcz",
         "./HuffmanCodebook"
       ],
       "stopAtEntry": false,

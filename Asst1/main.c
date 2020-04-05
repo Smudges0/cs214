@@ -132,11 +132,7 @@ int main(int argc, char *argv[])
 			readToDecode(fileName, &codeTreeHead);
 		}
 	}
-	if (!headRef)
-	{
-		printf("No valid tokens.\n");
-		exit(EXIT_FAILURE);
-	}
+
 	// printNodes(headRef);
 	// printf("\n");
 	// printf(" Str | Huffman code ");

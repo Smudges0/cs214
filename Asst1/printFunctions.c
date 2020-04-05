@@ -38,7 +38,6 @@ void printCodeFile(HeapNode *root, int code[], int top, int fd)
   }
   if (root->right)
   {
-
     code[top] = 1;
     printCodeFile(root->right, code, top + 1, fd);
   }
