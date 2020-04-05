@@ -1,0 +1,59 @@
+I tested the following combinations of flags:
+
+
+Valid
+------
+-b <.txt>
+-c <.txt> <codebook>
+-d <.hcz> <codebook>
+-R -b <dir>
+-R -c <dir> <codebook>
+-R -d <dir> <codebook>
+
+-R flag must come first before other flags
+-c and -d must have 2 files.  Second file is codebook.
+-b must have only 1 file.
+
+Clear text file ext must be .txt, and must be a file (not dir)
+Compressed file ext must be .hcz, and must be a file (not dir)
+Codebook name can be anything, and must be a file (not dir)
+Directory name must be a directory
+
+
+Invalid
+--------
+No flags
+More than 2 flags max: -R -b -c
+-R flag alone
+-R flag after other flag: -b -R
+Wrong flag: -g
+Flag with > 1 letter: -Rb
+No file/path for -b, -c
+No codebook for -c, -d
+Clear text file ext not .txt for -b, -c
+Clear text file is a dir
+Compressed file ext not hcz for -d
+Compressed file is a dir
+Codebook file is a dir
+Directory is a file
+
+
+
+
+Test files
+
+I ran the fileCompressor program with the -b, -c, and -d flags on all files individually, as well as in a group with recursive mode.
+----------
+test0: Newline terminated. Tested handling of regular files with whitespace at the end.
+test1: Big file, multiple consecutive newlines and tabs, extremely long token, newline terminated, contains \r, \t, \n. Tested for ability to handle long files
+				and extremely long tokens (5313 characters, in this case), as well as multiple consecutive whitespaces
+test2: Empty file. Tested ability to handle completely blank files and still generate useable codebooks.
+test3: 5 consecutive spaces, begins and ends with whitespace. Tested ability to handle single-token files and consecutive whitespaces.
+test4: Space terminated. Mostly standard test file with spaces at end to test whitespace handling.
+test5: Extremely long token. Tested ability to handle single-token files and extremely long tokens.
+test6: Non-whitespace terminated, no whitespace at beginning. Standard test file.
+test7: Consecutive newlines. Tested ability to handle consecutive whitespaces.
+test8: Normal file, in subdirectory. Normal test file in a subdirectory to test recursive functionality.
+
+empty subdirectory
+subdirectory with .txt in the name
