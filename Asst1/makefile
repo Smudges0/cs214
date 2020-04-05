@@ -1,5 +1,5 @@
 CC = gcc # set compiler
-CFLAGS = -g -Wall # add debugging to executable, turn on all compiler warnings
+CFLAGS = -g # add debugging to executable, turn on all compiler warnings
 
 .PHONY: all # in case there's a file called 'all'
 all: testProgram

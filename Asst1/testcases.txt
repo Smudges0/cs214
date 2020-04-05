@@ -37,3 +37,14 @@ Compressed file is a dir
 Codebook file is a dir
 Directory is a file
 
+Test files
+----------
+test0: Newline terminated
+test1: Big file, multiple consecutive newlines, extremely long token, newline terminated
+test2: Empty file
+test3: 5 consecutive spaces, begins and ends with whitespace
+test4: Space terminated
+test5: Extremely long token
+test6: Non-whitespace terminated, no whitespace at beginning
+test7: Consecutive newlines
+test8: Normal file, in subdirectory
