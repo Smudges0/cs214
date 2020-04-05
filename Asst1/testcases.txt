@@ -40,7 +40,7 @@ Directory is a file
 Test files
 ----------
 test0: Newline terminated
-test1: Big file, multiple consecutive newlines, extremely long token, newline terminated
+test1: Big file, multiple consecutive newlines, extremely long token, newline terminated, contains \r, \t, \n, 
 test2: Empty file
 test3: 5 consecutive spaces, begins and ends with whitespace
 test4: Space terminated
@@ -48,3 +48,6 @@ test5: Extremely long token
 test6: Non-whitespace terminated, no whitespace at beginning
 test7: Consecutive newlines
 test8: Normal file, in subdirectory
+
+empty subdirectory
+subdirectory with .txt in the name

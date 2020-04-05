@@ -1,5 +1,5 @@
 #!/bin/bash
-TESTDIR=./testcasesBB
+TESTDIR=./testcases
 FILES=$TESTDIR/test*.txt
 EXE=./testProgram
 
