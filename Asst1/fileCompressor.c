@@ -102,6 +102,11 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
+			if (!isRegFile(fileName))
+			{
+				printf("Path given is not a file.\n");
+				exit(EXIT_FAILURE);
+			}
 			readBuildCodebook(fileName, &headRef);
 		}
 
@@ -119,6 +124,11 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
+			if (!isRegFile(fileName))
+			{
+				printf("Path given is not a file.\n");
+				exit(EXIT_FAILURE);
+			}
 			readToEncode(fileName, &headRef);
 		}
 
@@ -137,6 +147,11 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
+			if (strcmp(getExtension(fileName), ".hcz") == 0)
+			{
+				printf("Given file is not .hcz, cannot be decompressed.\n");
+				exit(EXIT_FAILURE);
+			}
 			readToDecode(fileName, &codeTreeHead);
 		}
 
