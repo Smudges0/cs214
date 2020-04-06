@@ -8,10 +8,11 @@
       "name": "gcc build and debug active file",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${fileDirname}/testProgram",
+      "program": "${fileDirname}/fileCompressor",
       "args": [
-        "-b",
-        "./testcases/test1.txt"
+        "-d",
+        "./testcases/test9.hcz",
+        "./HuffmanCodebook"
       ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
