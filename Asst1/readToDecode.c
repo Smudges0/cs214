@@ -15,9 +15,9 @@ void readToDecode(char *fileName, HeapNode **codeTreeHead)
 {
   INIT_READ(fileName);
 
-  char *outputFileName = malloc(sizeof(char) * strlen(fileName) + 5);
+  char *outputFileName = malloc(sizeof(char) * strlen(fileName) + 1);
   strcpy(outputFileName, fileName);
-  strcat(outputFileName, ".txt\0");
+  outputFileName[strlen(fileName) - 4] = '\0';
 
   int decodeFile = open(outputFileName, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
   HeapNode *currentNode = *codeTreeHead;

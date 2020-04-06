@@ -48,7 +48,7 @@ void callRecursively(char *basePath, HeapNode **headRef, void (*readFunction)(ch
     {
       // if file ends in .txt
       // printf("%s\n", getExtension(directoryEntry->d_name));
-      if (strcmp(getExtension(directoryEntry->d_name), "txt") == 0)
+      if (isRegFile(newPathName))
       {
         readFunction(newPathName, headRef); // readBuildCodebook(basepath, headRef); or readToEncode(basePath, &headRef)
       }
@@ -79,4 +79,11 @@ int isDirectory(char *path)
   struct stat pathStat;
   stat(path, &pathStat);
   return S_ISDIR(pathStat.st_mode);
+}
+
+int isRegFile(char *path)
+{
+  struct stat pathStat;
+  stat(path, &pathStat);
+  return S_ISREG(pathStat.st_mode);
 }
