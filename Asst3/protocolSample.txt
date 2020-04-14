@@ -1,0 +1,53 @@
+# Checkout
+00 <projectName> <EOF>
+# Response
+00 <# bytes>:<.manifest> <# bytes>:<file name 1> <# bytes>:<file 1>...<EOF>
+01 <Error message> <EOF>
+
+# Push
+01 <# bytes>:<Project Name> <# bytes>:<.commit file> <# bytes>:<file name 1> <# bytes>:<file 1>...<EOF>
+# Response
+00 <EOF>
+01 <Error message> <EOF>
+
+# Update
+02 <Project Name> <EOF>
+# Response
+00 <# bytes>:<.manifest> <EOF>
+01 <Error message> <EOF>
+
+# Upgrade
+03 <# bytes>:<file name 1> <# bytes>:<file name 2>...<EOF> 
+# Response
+00 <# bytes>:<file name 1> <# bytes>:<file1>...<EOF>
+01 <Error message> <EOF>
+
+# Create
+04 <projectName> <EOF>
+# Response
+00 <# bytes>:<.manifest> <EOF>
+01 <Error message> <EOF>
+
+# Destroy
+05 <projectName> <EOF>
+# Response
+00 <EOF>
+01 <Error message> <EOF>
+
+# Current Version
+06 <projectName> <EOF>
+# Response
+00 <# bytes>:<.manifest> <EOF>
+01 <Error message> <EOF>
+
+# History
+07 <projectName> <EOF>
+# Response
+00 <# bytes>:<.history> <EOF>
+01 <Error message> <EOF>
+
+# Rollback
+08 <# bytes>:<projectName> <versionNumber> <EOF>
+# Response
+00 <EOF>
+01 <Error message> <EOF>
