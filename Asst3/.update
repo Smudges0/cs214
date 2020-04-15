@@ -1,3 +1,3 @@
-M 3 /subdirectory/file1 1735837
-A 1 /file2 58375434
-D 12 /file3 32872394
+M /subdirectory/file1 1735837
+A /file2 58375434
+D /file3 32872394
